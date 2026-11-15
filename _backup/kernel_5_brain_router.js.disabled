@@ -1,0 +1,407 @@
+'use strict';
+
+/**
+ * kernel_5_brain_router.js — JARVIS-CORE AI Brain (Groq Latest Models Fix)
+ */
+
+const { ipcMain, dialog } = require('electron');
+const fs = require('fs');
+const path = require('path');
+const https = require('https');
+const { execSync } = require('child_process');
+
+const ROOT = process.env.JARVIS_ROOT || path.resolve(__dirname, '..');
+const CONFIG_DIR = path.join(ROOT, '01_CONFIG');
+const SETTINGS_FILE = path.join(CONFIG_DIR, 'settings.json');
+
+const PROVIDER_ORDER = ['groq', 'gemini', 'deepseek', 'openrouter', 'cerebras'];
+const MAX_STEPS = 6;
+const MAX_PROMPT_CHARS = 4000;
+const MAX_READ_CHARS = 8000;
+const REQUEST_TIMEOUT_MS = 25000;
+
+// Groq-এর লেটেস্ট এবং রানিং মডেল এখানে আপডেট করা হলো
+const DEFAULTS = {
+  groq: {
+    model: 'llama-3.3-70b-specdec',
+    fallbackModels: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
+    baseURL: 'https://api.groq.com/openai/v1',
+  },
+  gemini: {
+    model: 'gemini-1.5-flash',
+    fallbackModels: ['gemini-2.0-flash'],
+    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
+  },
+  deepseek: {
+    model: 'deepseek-chat',
+    fallbackModels: [],
+    baseURL: 'https://api.deepseek.com/v1',
+  },
+  openrouter: {
+    model: 'meta-llama/llama-3.1-8b-instruct:free',
+    fallbackModels: [],
+    baseURL: 'https://openrouter.ai/api/v1',
+  },
+  cerebras: {
+    model: 'llama3.1-8b',
+    fallbackModels: [],
+    baseURL: 'https://api.cerebras.ai/v1',
+  },
+};
+
+const SYSTEM_PROMPT_CHAT = 'You are JARVIS, a smart, concise OS-level AI assistant.';
+const SYSTEM_PROMPT_TASK = [
+  'You are JARVIS, an OS-level AI agent.',
+  'You can read, write, and list files inside the JARVIS root, and run shell commands.',
+  'When modifying code, always provide the COMPLETE file content.',
+  'Never touch files outside the root. Never expose API keys.',
+].join(' ');
+
+const TOOLS = Object.freeze([
+  { type: 'function', function: { name: 'get_status', description: 'Return the current mode.', parameters: { type: 'object', properties: {} } } },
+  { type: 'function', function: { name: 'list_dir', description: 'List directory.', parameters: { type: 'object', properties: { path: { type: 'string' } }, required: ['path'] } } },
+  { type: 'function', function: { name: 'read_file', description: 'Read file.', parameters: { type: 'object', properties: { path: { type: 'string' } }, required: ['path'] } } },
+  { type: 'function', function: { name: 'write_file', description: 'Write full content to file.', parameters: { type: 'object', properties: { path: { type: 'string' }, content: { type: 'string' } }, required: ['path', 'content'] } } },
+  { type: 'function', function: { name: 'run_command', description: 'Run shell command.', parameters: { type: 'object', properties: { command: { type: 'string' } }, required: ['command'] } } },
+]);
+
+let CTX = null;
+let AI = {};
+
+function detectProviderByKeyPrefix(rawKey) {
+  if (typeof rawKey !== 'string') return null;
+  const k = rawKey.trim();
+  if (/^gsk_[A-Za-z0-9_-]{20,}$/.test(k)) return { provider: 'groq', key: k };
+  if (/^AIza[A-Za-z0-9_-]{25,}$/.test(k)) return { provider: 'gemini', key: k };
+  if (/^sk-or-v1-[A-Za-z0-9_-]{20,}$/.test(k)) return { provider: 'openrouter', key: k };
+  if (/^csk-[A-Za-z0-9_-]{20,}$/.test(k)) return { provider: 'cerebras', key: k };
+  if (/^sk-[A-Za-z0-9_-]{20,}$/.test(k)) return { provider: 'deepseek', key: k };
+  return null;
+}
+
+function scanTextForKeys(text, targetMap) {
+  if (!text || typeof text !== 'string') return;
+  const patterns = [
+    { name: 'groq',       re: /\bgsk_[A-Za-z0-9_-]{20,}\b/g },
+    { name: 'gemini',     re: /\bAIza[A-Za-z0-9_-]{25,}\b/g },
+    { name: 'openrouter', re: /\bsk-or-v1-[A-Za-z0-9_-]{20,}\b/g },
+    { name: 'cerebras',   re: /\bcsk-[A-Za-z0-9_-]{20,}\b/g },
+    { name: 'deepseek',   re: /\bsk-[A-Za-z0-9]{20,}\b/g },
+  ];
+  for (const p of patterns) {
+    const match = text.match(p.re);
+    if (match && match[0] && !targetMap[p.name]) {
+      targetMap[p.name] = match[0];
+    }
+  }
+}
+
+function autoDiscoverAllKeys(existingInput = {}) {
+  const rawKeys = {};
+
+  if (existingInput && typeof existingInput === 'object') {
+    for (const [k, v] of Object.entries(existingInput)) {
+      const lower = k.toLowerCase();
+      if (typeof v === 'string' && v.trim()) {
+        const auto = detectProviderByKeyPrefix(v);
+        rawKeys[auto ? auto.provider : lower] = v.trim();
+      } else if (v && typeof v === 'object' && typeof v.key === 'string' && v.key.trim()) {
+        rawKeys[lower] = v.key.trim();
+      }
+    }
+  }
+
+  try {
+    if (fs.existsSync(SETTINGS_FILE)) {
+      scanTextForKeys(fs.readFileSync(SETTINGS_FILE, 'utf8'), rawKeys);
+    }
+  } catch (_) {}
+
+  const dropFiles = [
+    path.join(CONFIG_DIR, 'api_keys.txt'),
+    path.join(CONFIG_DIR, '.env'),
+    path.join(ROOT, '.env'),
+    path.join(ROOT, 'api_keys.txt'),
+  ];
+  for (const df of dropFiles) {
+    try {
+      if (fs.existsSync(df)) scanTextForKeys(fs.readFileSync(df, 'utf8'), rawKeys);
+    } catch (_) {}
+  }
+
+  const out = {};
+  for (const name of PROVIDER_ORDER) {
+    const key = rawKeys[name];
+    if (!key || key.length < 8) continue;
+    const model = DEFAULTS[name].model;
+    const baseURL = DEFAULTS[name].baseURL.replace(/\/+$/, '');
+    out[name] = { key, model, baseURL };
+  }
+  return out;
+}
+
+function persistAiProvidersToSettings(cleanMap) {
+  try {
+    const json = fs.existsSync(SETTINGS_FILE)
+      ? JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8'))
+      : {};
+    json.ai_providers = { ...(json.ai_providers || {}), ...cleanMap };
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(json, null, 2), 'utf8');
+  } catch (e) {
+    if (CTX) CTX.audit('error', 'ai_settings_persist_failed', { error: String(e) });
+  }
+}
+
+function resolveInRoot(p) {
+  if (typeof p !== 'string' || p.length === 0 || p.includes('\0')) return null;
+  const resolved = path.resolve(ROOT, p);
+  if (!resolved.startsWith(ROOT)) return null;
+  return resolved;
+}
+
+async function toolGetStatus() { return { mode: CTX.settings?.mode ?? 'SEMI_AUTO' }; }
+
+async function toolListDir(args) {
+  const dir = resolveInRoot(args.path ?? '.');
+  if (!dir) return { error: 'path_denied' };
+  try {
+    const entries = fs.readdirSync(dir, { withFileTypes: true }).map(e => ({ name: e.name, type: e.isDirectory() ? 'dir' : 'file' }));
+    return { path: args.path, entries };
+  } catch (e) { return { error: String(e) }; }
+}
+
+async function toolReadFile(args) {
+  const file = resolveInRoot(args.path);
+  if (!file) return { error: 'path_denied' };
+  try {
+    const text = fs.readFileSync(file, 'utf8');
+    return { path: args.path, content: text.slice(0, MAX_READ_CHARS) };
+  } catch (e) { return { error: String(e) }; }
+}
+
+async function toolWriteFile(args) {
+  const file = resolveInRoot(args.path);
+  if (!file) return { error: 'path_denied' };
+  const isFrozen = file.includes('00_ENGINE') || file.includes('01_CONFIG');
+  if (isFrozen) {
+    const { response } = await dialog.showMessageBox({
+      type: 'warning', buttons: ['Deny', 'Approve'], defaultId: 0,
+      message: 'AI wants to modify a core file.', detail: `File: ${args.path}`
+    });
+    if (response !== 1) return { error: 'permission_denied' };
+  }
+  try {
+    fs.writeFileSync(file, args.content, 'utf8');
+    return { success: true, path: args.path };
+  } catch (e) { return { error: String(e) }; }
+}
+
+async function toolRunCommand(args) {
+  const { response } = await dialog.showMessageBox({
+    type: 'question', buttons: ['Deny', 'Approve'], defaultId: 0,
+    message: 'AI wants to run a command.', detail: args.command
+  });
+  if (response !== 1) return { error: 'permission_denied' };
+  try {
+    const output = execSync(args.command, { cwd: ROOT, timeout: 30000 }).toString();
+    return { success: true, stdout: output.slice(0, MAX_READ_CHARS) };
+  } catch (e) { return { error: String(e) }; }
+}
+
+async function runTool(call) {
+  const name = call?.function?.name;
+  let args = {};
+  try { args = JSON.parse(call.function.arguments || '{}'); } catch (_) {}
+  if (name === 'get_status') return JSON.stringify(await toolGetStatus());
+  if (name === 'list_dir') return JSON.stringify(await toolListDir(args));
+  if (name === 'read_file') return JSON.stringify(await toolReadFile(args));
+  if (name === 'write_file') return JSON.stringify(await toolWriteFile(args));
+  if (name === 'run_command') return JSON.stringify(await toolRunCommand(args));
+  return JSON.stringify({ error: 'unknown_tool' });
+}
+
+function callProvider(cfg, modelName, messages, tools) {
+  return new Promise((resolve, reject) => {
+    const fullUrl = `${cfg.baseURL.replace(/\/+$/, '')}/chat/completions`;
+    const u = new URL(fullUrl);
+
+    const payload = { model: modelName, messages, temperature: 0.2 };
+    if (tools && tools.length > 0) payload.tools = tools;
+    const body = JSON.stringify(payload);
+
+    const options = {
+      protocol: u.protocol,
+      hostname: u.hostname,
+      port: u.port || 443,
+      path: u.pathname + u.search,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': 'JarvisCore/3.0',
+        'Authorization': `Bearer ${cfg.key}`,
+        'Content-Length': Buffer.byteLength(body),
+      },
+      timeout: REQUEST_TIMEOUT_MS,
+    };
+
+    const req = https.request(options, (res) => {
+      const chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => {
+        const raw = Buffer.concat(chunks).toString('utf8');
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          let apiMsg = raw.slice(0, 200);
+          try {
+            const errJson = JSON.parse(raw);
+            if (errJson.error && errJson.error.message) apiMsg = errJson.error.message;
+          } catch (_) {}
+          const err = new Error(`HTTP_${res.statusCode}: ${apiMsg}`);
+          err.status = res.statusCode;
+          reject(err);
+          return;
+        }
+        try {
+          const parsed = JSON.parse(raw);
+          const msg = parsed?.choices?.[0]?.message;
+          if (!msg) throw new Error('empty_choices');
+          resolve(msg);
+        } catch (parseErr) {
+          reject(new Error(`invalid_json_response: ${parseErr.message}`));
+        }
+      });
+    });
+
+    req.on('error', e => reject(new Error(e.code || e.message || 'network_error')));
+    req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
+    req.write(body);
+    req.end();
+  });
+}
+
+async function askAI(messages, tools, requestedModel) {
+  if (Object.keys(AI).length === 0) {
+    AI = autoDiscoverAllKeys(CTX?.settings?.ai_providers);
+  }
+
+  let providers = [...PROVIDER_ORDER];
+  if (requestedModel && providers.includes(requestedModel)) {
+    providers = [requestedModel, ...providers.filter(p => p !== requestedModel)];
+  }
+
+  const errors = [];
+
+  for (const name of providers) {
+    const cfg = AI[name];
+    if (!cfg) continue;
+
+    const modelsToTry = [
+      cfg.model,
+      ...(DEFAULTS[name]?.fallbackModels || []),
+    ].filter((v, idx, arr) => v && arr.indexOf(v) === idx);
+
+    for (const modelName of modelsToTry) {
+      try {
+        CTX.audit('info', 'ai_request_attempt', { provider: name, model: modelName });
+        const reply = await callProvider(cfg, modelName, messages, tools);
+        CTX.audit('info', 'ai_request_success', { provider: name, model: modelName });
+        return reply;
+      } catch (e) {
+        errors.push(`${name}(${modelName}): ${e.message}`);
+        CTX.audit('warn', 'ai_provider_failed', { provider: name, model: modelName, error: String(e.message).slice(0, 160) });
+        if (e.status === 401) break;
+      }
+    }
+  }
+
+  throw new Error(errors.length > 0 ? errors.join(' | ') : 'no_configured_providers');
+}
+
+async function ask(userPrompt, mode = 'chat', requestedModel = null) {
+  if (!userPrompt || typeof userPrompt !== 'string') return 'Empty prompt.';
+  const trimmed = userPrompt.trim();
+
+  const detected = detectProviderByKeyPrefix(trimmed);
+  if (detected) {
+    const { provider, key } = detected;
+    AI[provider] = { key, model: DEFAULTS[provider].model, baseURL: DEFAULTS[provider].baseURL };
+    persistAiProvidersToSettings(AI);
+    CTX.audit('info', 'ai_key_auto_detected_from_chat', { provider });
+    return `✅ Auto-detected & saved your ${provider.toUpperCase()} API Key! You can now chat with me directly.`;
+  }
+
+  if (Object.keys(AI).length === 0) {
+    AI = autoDiscoverAllKeys(CTX?.settings?.ai_providers);
+  }
+
+  if (Object.keys(AI).length === 0) {
+    return '⚠️ No API Key configured yet! Simply paste your Groq (gsk_...), Gemini (AIza...), or DeepSeek (sk-...) API key right here in the chat box.';
+  }
+
+  const isTask = mode === 'task';
+  const messages = [
+    { role: 'system', content: isTask ? SYSTEM_PROMPT_TASK : SYSTEM_PROMPT_CHAT },
+    { role: 'user', content: trimmed.slice(0, MAX_PROMPT_CHARS) }
+  ];
+
+  try {
+    for (let step = 0; step < MAX_STEPS; step++) {
+      const msg = await askAI(messages, isTask ? TOOLS : null, requestedModel);
+      if (!msg.tool_calls || msg.tool_calls.length === 0) return msg.content || 'Done.';
+      messages.push(msg);
+      for (const call of msg.tool_calls) {
+        messages.push({ role: 'tool', tool_call_id: call.id, content: await runTool(call) });
+      }
+    }
+    return 'Max tool steps reached.';
+  } catch (e) {
+    return `❌ AI Error: ${e.message}`;
+  }
+}
+
+function init(ctx) {
+  CTX = ctx;
+  AI = autoDiscoverAllKeys(ctx.settings?.ai_providers);
+
+  if (Object.keys(AI).length > 0) {
+    persistAiProvidersToSettings(AI);
+  }
+
+  ipcMain.on('jarvis:save-ai-config', (_event, data) => {
+    try {
+      const mergedInput = { ...(ctx.settings?.ai_providers || {}), ...AI };
+      if (data && typeof data === 'object') {
+        for (const [k, v] of Object.entries(data)) {
+          if (v) mergedInput[k] = v;
+        }
+      }
+      AI = autoDiscoverAllKeys(mergedInput);
+      persistAiProvidersToSettings(AI);
+      ctx.audit('info', 'ai_config_saved', { providers: Object.keys(AI) });
+    } catch (e) {
+      ctx.audit('error', 'ai_config_save_failed', { error: String(e) });
+    }
+  });
+
+ipcMain.on('jarvis:ai-prompt', async (event, data) => {
+    const res = await ask(data?.prompt, data?.mode, data?.model);
+    event.sender.send('jarvis:ai-response', { text: res }); // <- হাইফেন দিয়ে দিলাম
+  });
+
+  const tgBridge = ctx.getService('telegram');
+  if (tgBridge && tgBridge.enabled) {
+    tgBridge.on('command:ai', async (d) => {
+      if (!d || !d.text) return;
+      const reply = await ask(d.text, 'chat');
+      tgBridge.sendMessage(`🤖 JARVIS:\n${String(reply).slice(0, 3500)}`).catch(() => {});
+    });
+  }
+
+  ctx.addStateContributor('ai_brain', () => ({
+    configured_providers: Object.keys(AI),
+  }));
+
+  ctx.audit('info', 'brain_router_ready', { providers_detected: Object.keys(AI) });
+}
+
+module.exports = { name: 'brain_router', init, ask };

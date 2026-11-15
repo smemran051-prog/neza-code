@@ -1,0 +1,12 @@
+// playwright.config.js
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
+  testDir: './tests',
+  timeout: 30000,
+  fullyParallel: false,
+  workers: 1,
+  reporter: 'list',
+  // শুধুমাত্র .spec.js ফাইলগুলো রান করবে, Jest-এর .test.js ফাইল ইগনোর করবে
+  testMatch: '**/*.spec.js', 
+});

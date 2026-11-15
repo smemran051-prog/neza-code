@@ -1,0 +1,41 @@
+{
+  "version": "10.0.0",
+  "updatedAt": "2026-11-09T16:12:58.471Z",
+  "extensions": [
+    {
+      "id": "kernel_10_neural_tab_bridge",
+      "entry": "kernel_10_neural_tab_bridge.js",
+      "version": "10.0.2",
+      "enabled": true,
+      "folder": "00_ENGINE"
+    },
+    {
+      "id": "kernel_10_stt_intent_normalizer",
+      "entry": "kernel_10_stt_intent_normalizer.js",
+      "version": "10.0.2",
+      "enabled": true,
+      "folder": "00_ENGINE"
+    },
+    {
+      "id": "kernel_10_shared_context_bus",
+      "entry": "kernel_10_shared_context_bus.js",
+      "version": "10.0.2",
+      "enabled": true,
+      "folder": "00_ENGINE"
+    },
+    {
+      "id": "kernel_10_webview_preload",
+      "entry": "kernel_10_webview_preload.js",
+      "version": "10.0.2",
+      "enabled": true,
+      "folder": "00_ENGINE"
+    },
+    {
+      "id": "kernel_10_workspace_ui_injector",
+      "entry": "kernel_10_workspace_ui_injector.js",
+      "version": "10.0.2",
+      "enabled": true,
+      "folder": "00_ENGINE"
+    }
+  ]
+}

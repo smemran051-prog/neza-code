@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "mode": "SEMI_AUTO",
+  "unattended": false,
+  "install_date": null,
+  "python_path": "python",
+  "limits": {
+    "ram_limit_mb": 1536,
+    "max_consecutive_errors": 3,
+    "stop_poll_ms": 200,
+    "telemetry_interval_ms": 1000,
+    "process_ram_interval_ms": 3000,
+    "os_hands_ready_timeout_ms": 8000,
+    "os_hands_cmd_timeout_ms": 5000
+  },
+  "kill_switch": {
+    "hotkey": "CommandOrControl+Alt+Shift+K",
+    "stop_flag_name": "STOP.flag",
+    "stop_hook": {
+      "enabled": true,
+      "host": "127.0.0.1",
+      "port": 47821,
+      "token_file": "01_CONFIG/.stop_token"
+    }
+  },
+  "hands": {
+    "human_idle_threshold_ms": 2000,
+    "monitor_interval_ms": 100,
+    "settle_ms": 30
+  },
+  "risky": {
+    "dialog_timeout_ms": 60000
+  },
+  "presence": {
+    "away_threshold_ms": 900000,
+    "poll_ms": 2000
+  },
+  "logs": {
+    "dir": "logs"
+  },
+  "screenshots": {
+    "dir": "work/screenshots"
+  },
+  "telegram": {},
+  "night_mode": {
+    "enabled": false,
+    "start_time": "23:00",
+    "end_time": "07:00",
+    "summary_time": "07:05"
+  },
+  "ai_providers": {
+    "groq": {
+      "key": "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",
+      "model": "openai/gpt-oss-120b",
+      "baseURL": "https://api.groq.com/openai/v1"
+    },
+    "gemini": {
+      "key": "AQ.Ab8RN6LC9-uQsmUxoahKh7Ew62ZlfVqPXHCU6pbaRsqnTsa7kg",
+      "model": "gemini-flash-lite-latest",
+      "baseURL": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "liveModel": "models/gemini-3.1-flash-live-preview"
+    },
+    "deepseek": {
+      "key": "sk-0611b982287b43539cf82147e691c74e",
+      "model": "deepseek-chat",
+      "baseURL": "https://api.deepseek.com/v1"
+    },
+    "openrouter": {
+      "model": "deepseek/deepseek-r1:free",
+      "baseURL": "https://openrouter.ai/api/v1"
+    },
+    "cerebras": {
+      "model": "llama3.1-8b",
+      "baseURL": "https://api.cerebras.ai/v1"
+    },
+    "ollama": {
+      "model": "llama3.2:latest",
+      "localURL": "http://127.0.0.1:11434",
+      "tailscaleURL": "",
+      "preferTailscale": false
+    }
+  }
+}

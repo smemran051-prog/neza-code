@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-11-07T00:00:00.000Z",
+  "total_tools": 3,
+  "tools": [
+    {
+      "name": "system_health_report",
+      "file": "system_health_report.js",
+      "description": "A1. Check Windows PC hardware health, free RAM, total memory, CPU model, and system uptime.",
+      "tags": ["system", "health", "ram", "memory", "cpu", "uptime", "pc", "status", "hardware", "check"],
+      "risk": "READ",
+      "enabled": true
+    },
+    {
+      "name": "save_workspace_note",
+      "file": "save_workspace_note.js",
+      "description": "B1. Create and save a text or markdown note inside the JARVIS work/notes directory.",
+      "tags": ["note", "save", "report", "markdown", "log", "memo", "draft", "workspace", "summary"],
+      "risk": "WRITE_SAFE",
+      "enabled": true
+    },
+    {
+      "name": "search_local_files",
+      "file": "search_local_files.js",
+      "description": "C1. Find and search files by name keyword inside JARVIS root or Desktop folder.",
+      "tags": ["search", "find", "locate", "file", "filename", "desktop", "folder", "scan", "lookup"],
+      "risk": "READ",
+      "enabled": true
+    }
+  ]
+}

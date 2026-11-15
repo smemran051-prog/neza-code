@@ -1,0 +1,32 @@
+{
+  "module_name": "system_block",
+  "version": "1.0.0",
+  "description": "Core OS interactions, local file system operations, and terminal execution gateway.",
+  "default_risk_level": "WRITE_SAFE",
+  "capabilities": [
+    "file_system_read",
+    "file_system_write",
+    "process_execution",
+    "os_hardware_bridge"
+  ],
+  "registered_tools": [
+    "advanced_cli_daemon",
+    "append_log_entry",
+    "battery_power_status",
+    "calculate_expression",
+    "clipboard_read",
+    "clipboard_write",
+    "close_app",
+    "create_directory",
+    "deep_data_recovery",
+    "delete_file",
+    "get_current_datetime",
+    "inspect_file_metadata",
+    "pc_sleep_lock",
+    "process_list",
+    "save_workspace_note",
+    "search_local_files",
+    "system_health_report",
+    "tool_jarvis_core"
+  ]
+}

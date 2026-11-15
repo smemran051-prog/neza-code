@@ -1,0 +1,19 @@
+{
+  "module_name": "network_block",
+  "version": "1.0.0",
+  "description": "External web search, HTTP/REST fetching, DOM scraping, and browser automation.",
+  "default_risk_level": "READ",
+  "capabilities": [
+    "web_search",
+    "http_client",
+    "dom_scraping",
+    "api_gateway"
+  ],
+  "registered_tools": [
+    "download_file",
+    "fetch_public_ip",
+    "fetch_web_text",
+    "network_ping_check",
+    "open_url"
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "version": "1.0.0",
+  "capturedAt": "2026-11-14T17:44:54.770Z",
+  "tabs": [
+    {
+      "id": "tab_42963300b5df3456",
+      "panel": "right",
+      "url": "https://www.google.com/",
+      "title": "Google",
+      "isPinned": false,
+      "zoom": 1,
+      "createdAt": 1794678096839,
+      "lastActiveAt": 1794678096874
+    },
+    {
+      "id": "tab_cc9334b44e90193b",
+      "panel": "left",
+      "url": "https://www.google.com/sorry/index?continue=https://www.google.com/&q=EgQtfd5ZGOuqzdcGIinbvOgSAsVl19lMYFuoOzJ_Ub6O7pi7Y9BC8nnim8vi25Ru5OgKTvRksTICclJaAUNgzp_R_tWtk5HqAQ",
+      "title": "https://www.google.com/",
+      "isPinned": false,
+      "zoom": 1,
+      "createdAt": 1794678096848,
+      "lastActiveAt": 1794678096854
+    },
+    {
+      "id": "tab_8b3693ca2284bff6",
+      "panel": "left",
+      "url": "https://gemini.google.com/app",
+      "title": "Google Gemini",
+      "isPinned": false,
+      "zoom": 1,
+      "createdAt": 1794678096854,
+      "lastActiveAt": 1794678096854
+    },
+    {
+      "id": "tab_ab434b144a2423fb",
+      "panel": "left",
+      "url": "https://www.youtube.com/",
+      "title": "YouTube",
+      "isPinned": false,
+      "zoom": 1,
+      "createdAt": 1794678096862,
+      "lastActiveAt": 1794678096874
+    }
+  ],
+  "panels": [
+    {
+      "id": "left",
+      "tabIds": [
+        "tab_cc9334b44e90193b",
+        "tab_8b3693ca2284bff6",
+        "tab_ab434b144a2423fb"
+      ],
+      "activeTabId": "tab_ab434b144a2423fb",
+      "bounds": null,
+      "visible": false
+    },
+    {
+      "id": "right",
+      "tabIds": [
+        "tab_42963300b5df3456"
+      ],
+      "activeTabId": "tab_42963300b5df3456",
+      "bounds": null,
+      "visible": false
+    }
+  ],
+  "pipTabId": null
+}

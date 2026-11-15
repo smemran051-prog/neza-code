@@ -1,0 +1,16 @@
+{
+  "name": "memory_block",
+  "version": "1.0.0",
+  "description": "Centralized Persistent Memory Block for NEZA. Handles episodic, semantic, and preference memory.",
+  "entry": "index.js",
+  "api": "api.js",
+  "capabilities": [
+    "save_memory",
+    "search_memory",
+    "get_recent_memory"
+  ],
+  "permissions": {
+    "read": ["system", "central_brain"],
+    "write": ["system", "central_brain"]
+  }
+}

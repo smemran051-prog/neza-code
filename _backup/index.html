@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; media-src 'self' mediastream:;">
+    <title>JARVIS-CORE</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="dark">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">JARVIS</div>
+        <div class="logo-sub">Core System</div>
+        <nav class="nav">
+            <button class="nav-item" data-view="dashboard">Dashboard</button>
+            <button class="nav-item active" data-view="chat">AI Assistant</button>
+            <button class="nav-item" data-view="tools">Tools Library</button>
+            <button class="nav-item" data-view="jobhunter">Job Hunter</button>
+            <button class="nav-item" data-view="memory">Memory</button>
+            <button class="nav-item" id="btn-settings" style="margin-top: auto;">⚙️ Settings</button>
+        </nav>
+        <div class="theme-picker">
+            <label>Theme</label>
+            <select id="theme-select">
+                <option value="dark">Dark</option>
+                <option value="blue">Blue</option>
+                <option value="cyber">Cyber</option>
+                <option value="matrix">Matrix</option>
+                <option value="light">Light</option>
+            </select>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+        <header class="top-nav">
+            <div class="brand">JARVIS-CORE</div>
+            <div class="status-badge" id="engine-status">
+                <span class="dot"></span><span id="engine-status-text">Connecting…</span>
+            </div>
+            <div class="mode-badge" id="mode-badge">—</div>
+            <div class="presence-badge" id="presence-badge">
+                <span class="pdot"></span><span id="presence-text">UNKNOWN</span>
+            </div>
+            <button class="emergency" id="emergency-stop">Emergency Stop</button>
+        </header>
+
+        <div class="content">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="page-view" style="display: none;">
+                <div class="section-label">Telemetry</div>
+                <section class="cards">
+                    <div class="card"><div class="card-label">RAM Usage</div><div class="card-value" id="card-ram">—</div><div class="card-unit">megabytes</div></div>
+                    <div class="card"><div class="card-label">CPU Load</div><div class="card-value" id="card-cpu">—</div><div class="card-unit">percent</div></div>
+                    <div class="card"><div class="card-label">Kill Switch</div><div class="card-value" id="card-kill">—</div><div class="card-unit">armed / triggered</div></div>
+                    <div class="card"><div class="card-label">Engine Uptime</div><div class="card-value" id="card-uptime">—</div><div class="card-unit">since kernel start</div></div>
+                    <div class="card"><div class="card-label">Modules Loaded</div><div class="card-value" id="card-modules">—</div><div class="card-unit">active count</div></div>
+                    <div class="card"><div class="card-label">os_hands</div><div class="card-value" id="card-oshands">—</div><div class="card-unit">python bridge</div></div>
+                    <div class="card"><div class="card-label">Audit Events</div><div class="card-value" id="card-audit">0</div><div class="card-unit">this session</div></div>
+                    <div class="card"><div class="card-label">Stop Reason</div><div class="card-value" id="card-stop">—</div><div class="card-unit">last signal</div></div>
+                    <div class="card"><div class="card-label">Engine PID</div><div class="card-value" id="card-pid">—</div><div class="card-unit">electron main</div></div>
+                </section>
+                <div class="section-label" style="margin-top:20px;">Live Streams</div>
+                <section class="panes">
+                    <div class="pane">
+                        <div class="pane-header"><span>Live Terminal</span><span id="terminal-count">0</span></div>
+                        <div class="pane-body" id="terminal"></div>
+                    </div>
+                    <div class="pane">
+                        <div class="pane-header"><span>Audit Trail</span><span id="audit-count">0</span></div>
+                        <div class="pane-body" id="audit"></div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Chat View -->
+            <div id="chat-view" class="page-view" style="display: flex;">
+                <div class="chat-container" id="chat-messages">
+                    <div class="chat-msg ai">Hello! I am JARVIS. How can I help you today?</div>
+                </div>
+                <div class="chat-input-area">
+                    <div class="chat-tools">
+                        <select id="ai-model">
+                            <option value="groq">Groq (Fast)</option>
+                            <option value="gemini">Google (Gemini)</option>
+                            <option value="deepseek">DeepSeek</option>
+                            <option value="openrouter">OpenRouter</option>
+                            <option value="cerebras">Cerebras</option>
+                        </select>
+                        <button class="mode-toggle" id="mode-btn" data-mode="chat">Chat Mode</button>
+                    </div>
+                    <div class="chat-input-row">
+                        <button class="btn-upload" id="btn-upload-file" title="Upload File/Image">📎</button>
+                        <input type="file" id="ai-file-input" style="display: none;" accept="image/*,.txt,.js,.json,.html,.css" />
+                        <input type="text" id="ai-input" placeholder="Ask anything or command JARVIS..." autocomplete="off" />
+                        <select id="voice-lang-select" style="padding: 8px; border-radius: 6px; background: var(--surface); color: var(--text); border: 1px solid var(--border); outline: none; font-family: inherit; font-size: 14px; cursor: pointer; margin-right: 5px;">
+    <option value="bn">বাংলা</option>
+    <option value="en">English</option>
+    <option value="auto">Auto (All Languages)</option>
+</select>
+<button class="btn-mic" id="btn-mic" title="Voice Input">🎤</button>
+                        <button class="btn-send" id="btn-send-ai">Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placeholder Views (For future extensions) -->
+            <div id="tools-view" class="page-view" style="display: none;">
+                <div class="placeholder-box">
+                    <h2>🛠️ Tools Library</h2>
+                    <p>Dynamic Tool Manager is under construction. (Phase 3)</p>
+                </div>
+            </div>
+            <div id="jobhunter-view" class="page-view" style="display: none;">
+                <div class="placeholder-box">
+                    <h2>💼 Job Hunter</h2>
+                    <p>The AI Job Hunter module will be injected here via UI extension. (Phase 4)</p>
+                </div>
+            </div>
+                        <!-- Memory / Library View -->
+            <div id="memory-view" class="page-view" style="display: none; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px 0;">
+                    <h2 style="color: var(--accent); margin: 0;">📚 Chat Library</h2>
+                    <button id="btn-new-chat" style="padding: 8px 16px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">+ New Chat</button>
+                </div>
+                <div id="session-list" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1;"></div>
+            </div>
+    </div>
+
+    <!-- Floating HUD -->
+    <div class="hud" id="hud">
+        <div class="hud-header" id="hud-header">
+            <span>HUD</span>
+            <button class="hud-min" id="hud-min">—</button>
+        </div>
+        <div class="hud-body" id="hud-body">
+            <div class="hud-row"><span class="k">RAM</span><span class="v" id="hud-ram">—</span></div>
+            <div class="hud-row"><span class="k">CPU</span><span class="v" id="hud-cpu">—</span></div>
+            <div class="hud-row"><span class="k">Kill Switch</span><span class="v" id="hud-kill">—</span></div>
+            <div class="hud-row"><span class="k">Presence</span><span class="v" id="hud-presence">—</span></div>
+            <div class="hud-row"><span class="k">os_hands</span><span class="v" id="hud-oh">—</span></div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal">
+        <div class="modal-content">
+            <h2>Telegram Configuration</h2>
+            <label>Bot Token</label>
+            <input type="password" id="tg-token" autocomplete="off" placeholder="123456:ABC-DEF..." />
+            <label>Master Chat ID</label>
+            <input type="text" id="tg-chat-id" placeholder="123456789" />
+
+            <h2>🧠 AI Provider Keys & Models</h2>
+            <div class="row-group">
+                <div>
+                    <label>Groq API Key</label>
+                    <input type="password" id="ai-key-groq" autocomplete="off" placeholder="Leave blank to keep existing key or paste gsk_..." />
+                </div>
+                <div>
+                    <label>Groq Model</label>
+                    <input type="text" id="ai-model-groq" list="list-groq" placeholder="openai/gpt-oss-20b" />
+                    <datalist id="list-groq">
+                        <option value="openai/gpt-oss-20b"></option>
+                        <option value="openai/gpt-oss-120b"></option>
+                        <option value="llama-3.3-70b-versatile"></option>
+                        <option value="llama-3.1-8b-instant"></option>
+                    </datalist>
+                </div>
+            </div>
+            <div class="row-group">
+                <div>
+                    <label>Gemini API Key</label>
+                    <input type="password" id="ai-key-gemini" autocomplete="off" placeholder="Leave blank to keep existing key or paste AIza..." />
+                </div>
+                <div>
+                    <label>Gemini Model</label>
+                    <input type="text" id="ai-model-gemini" list="list-gemini" placeholder="gemini-flash-latest" />
+                    <datalist id="list-gemini">
+                        <option value="gemini-flash-latest"></option>
+                        <option value="gemini-pro-latest"></option>
+                        <option value="gemini-3.0-flash"></option>
+                        <option value="gemini-2.5-flash"></option>
+                        <option value="gemini-2.5-pro"></option>
+                    </datalist>
+                </div>
+            </div>
+            <div class="row-group">
+                <div>
+                    <label>DeepSeek API Key</label>
+                    <input type="password" id="ai-key-deepseek" autocomplete="off" placeholder="sk-..." />
+                </div>
+                <div>
+                    <label>DeepSeek Model</label>
+                    <input type="text" id="ai-model-deepseek" list="list-deepseek" placeholder="deepseek-chat" />
+                    <datalist id="list-deepseek">
+                        <option value="deepseek-chat"></option>
+                        <option value="deepseek-reasoner"></option>
+                    </datalist>
+                </div>
+            </div>
+            <div class="row-group">
+                <div>
+                    <label>OpenRouter API Key</label>
+                    <input type="password" id="ai-key-openrouter" autocomplete="off" placeholder="sk-or-v1-..." />
+                </div>
+                <div>
+                    <label>OpenRouter Model</label>
+                    <input type="text" id="ai-model-openrouter" list="list-openrouter" placeholder="meta-llama/llama-3.1-8b-instruct:free" />
+                    <datalist id="list-openrouter">
+                        <option value="meta-llama/llama-3.1-8b-instruct:free"></option>
+                        <option value="deepseek/deepseek-r1:free"></option>
+                    </datalist>
+                </div>
+            </div>
+            <div class="row-group">
+                <div>
+                    <label>Cerebras API Key</label>
+                    <input type="password" id="ai-key-cerebras" autocomplete="off" placeholder="csk-..." />
+                </div>
+                <div>
+                    <label>Cerebras Model</label>
+                    <input type="text" id="ai-model-cerebras" list="list-cerebras" placeholder="llama3.1-8b" />
+                    <datalist id="list-cerebras">
+                        <option value="llama3.1-8b"></option>
+                        <option value="llama-3.3-70b"></option>
+                    </datalist>
+                </div>
+            </div>
+
+            <button id="btn-refresh-models" type="button" class="btn-refresh">🔄 Auto-Check Available Gemini Models</button>
+            <div class="help-text">Keys are stored in settings.json. Type /model &lt;provider&gt; &lt;name&gt; in the AI chat to switch dynamically.</div>
+
+            <h2>🌙 Night Mode Settings</h2>
+            <div class="checkbox-row">
+                <label style="margin:0;">Enable Night Mode</label>
+                <input type="checkbox" id="night-enabled" />
+            </div>
+            <div class="row-group">
+                <div>
+                    <label>Start Time</label>
+                    <input type="time" id="night-start" value="23:00" />
+                </div>
+                <div>
+                    <label>End Time</label>
+                    <input type="time" id="night-end" value="07:00" />
+                </div>
+            </div>
+            <label>Morning Summary Time</label>
+            <input type="time" id="night-summary" value="07:05" />
+
+            <h2>🧩 Extension Manager</h2>
+            <label>Add New Extension (.js)</label>
+            <div class="row-group">
+                <input type="text" id="ext-file-name" placeholder="kernel_5_new_feature.js" style="flex:1;" />
+                <button id="btn-add-ext" type="button" class="btn-add-ext">Add</button>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" id="btn-cancel-settings">Cancel</button>
+                <button class="btn-save" id="btn-save-settings">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="tools_library.js"></script>
+    <script>ToolsLibraryUI.mount(document.getElementById('tools-view'));</script>
+</body>
+</html>

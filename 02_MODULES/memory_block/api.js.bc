@@ -1,0 +1,168 @@
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
+
+const ROOT = process.env.JARVIS_ROOT || path.resolve(__dirname, '..', '..');
+const STORAGE_DIR = path.join(__dirname, 'storage');
+const MEMORY_FILE = path.join(STORAGE_DIR, 'memory.jsonl');
+
+class MemoryAPI {
+  constructor() {
+    this.ensureStorage();
+  }
+
+  ensureStorage() {
+    try {
+      if (!fs.existsSync(STORAGE_DIR)) {
+        fs.mkdirSync(STORAGE_DIR, { recursive: true });
+      }
+      if (!fs.existsSync(MEMORY_FILE)) {
+        fs.writeFileSync(MEMORY_FILE, '', 'utf8');
+      }
+    } catch (e) {
+      console.error('[Memory Block] Failed to initialize storage:', e.message);
+    }
+  }
+
+  /**
+   * Save a memory. Appends to JSONL file for crash-safety.
+   * @param {object} data - { type, content, tags, metadata }
+   * @returns {object} saved memory
+   */
+  saveMemory(data) {
+    if (!data || typeof data.content !== 'string' || data.content.trim() === '') {
+      throw new Error('Memory content is required.');
+    }
+
+    const entry = {
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+      type: data.type || 'general', // e.g., episodic, semantic, preference
+      content: data.content.trim(),
+      tags: Array.isArray(data.tags) ? data.tags : [],
+      metadata: data.metadata || {}
+    };
+
+    const line = JSON.stringify(entry) + '\n';
+    
+    try {
+      fs.appendFileSync(MEMORY_FILE, line, 'utf8');
+      return { ok: true, entry };
+    } catch (e) {
+      return { ok: false, error: String(e.message) };
+    }
+  }
+
+  /**
+   * Retrieve all memories (up to limit), newest first.
+   */
+  getRecentMemories(limit = 20) {
+    try {
+      if (!fs.existsSync(MEMORY_FILE)) return [];
+      const lines = fs.readFileSync(MEMORY_FILE, 'utf8').trim().split('\n');
+      const validLines = lines.filter(l => l.trim() !== '');
+      
+      const memories = validLines.map(l => {
+        try { return JSON.parse(l); } catch (_) { return null; }
+      }).filter(Boolean);
+
+      return memories.reverse().slice(0, limit);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /**
+   * Simple keyword search through memories.
+   */
+  searchMemory(query, limit = 10) {
+    if (!query || typeof query !== 'string') return [];
+    
+    const q = query.toLowerCase();
+    const all = this.getRecentMemories(1000); // Load a chunk
+
+    const results = all.filter(m => {
+      const haystack = `${m.content} ${m.type} ${(m.tags || []).join(' ')}`.toLowerCase();
+      return haystack.includes(q);
+    });
+
+    return results.slice(0, limit);
+  }
+    /**
+   * UNIVERSAL GATEWAY (Rule 5: Generalized)
+   * Handles all dynamic calls from Central Brain (kernel_15) or AI.
+   * Normalizes action names, arguments, and response formats.
+   */
+  async executeTool(action, args = {}, ctx = {}) {
+    try {
+      // 1. Action Normalization (snake_case, camelCase, lowercase)
+      const normalizedAction = String(action || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const rawArgs = args && typeof args === 'object' ? args : { data: args };
+
+      // 2. Argument Extraction (Flexible AI inputs)
+      const extractContent = () => {
+        const c = rawArgs.content || rawArgs.text || rawArgs.message || rawArgs.data || rawArgs.value || '';
+        return typeof c === 'string' ? c : JSON.stringify(c);
+      };
+      const extractQuery = () => String(rawArgs.query || rawArgs.search || rawArgs.text || rawArgs.content || '');
+      const extractLimit = () => parseInt(rawArgs.limit || rawArgs.max || 10, 10);
+
+      // 3. Action Routing
+      let result = null;
+      switch (normalizedAction) {
+        case 'savememory':
+        case 'save':
+        case 'add':
+        case 'addmemory':
+        case 'remember':
+        case 'store':
+          result = this.saveMemory({
+            content: extractContent(),
+            type: rawArgs.type || 'general',
+            tags: Array.isArray(rawArgs.tags) ? rawArgs.tags : (rawArgs.tags ? [rawArgs.tags] : []),
+            metadata: rawArgs.metadata || {}
+          });
+          break;
+
+        case 'searchmemory':
+        case 'search':
+        case 'find':
+        case 'recall':
+          result = this.searchMemory(extractQuery(), extractLimit());
+          break;
+
+        case 'getrecentmemories':
+        case 'getrecent':
+        case 'recent':
+        case 'getall':
+          result = this.getRecentMemories(extractLimit());
+          break;
+
+        default:
+          // Fallback: If exact method exists, try calling it
+          if (typeof this[normalizedAction] === 'function') {
+            result = await Promise.resolve(this[normalizedAction](rawArgs));
+          } else {
+            throw new Error(`Unknown action: ${action}. Supported: save_memory, search_memory, get_recent_memory`);
+          }
+      }
+
+      // 4. Return Standardized Response Format
+      if (result && typeof result === 'object' && 'ok' in result) {
+        return result; // Already formatted { ok: true/false, ... }
+      }
+      return { ok: true, data: result };
+
+    } catch (err) {
+      // Fail-Safe: Never crash the orchestrator
+      if (ctx && typeof ctx.audit === 'function') {
+        ctx.audit('error', 'memory_block_executeTool_failed', { action, error: String(err.message) });
+      }
+      return { ok: false, error: String(err.message || err) };
+    }
+  }
+}
+
+module.exports = new MemoryAPI();

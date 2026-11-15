@@ -1,0 +1,656 @@
+'use strict';
+
+const path = require('path');
+const fs = require('fs');
+const { BrowserWindow, ipcMain } = require('electron');
+
+const LOG_TAG = 'k11.ui_extras';
+const ROOT = process.env.JARVIS_ROOT || path.resolve(__dirname, '..');
+const CONFIG_DIR = path.join(ROOT, '01_CONFIG', 'kernel11');
+const SETTINGS_FILE = path.join(CONFIG_DIR, 'ui_extras_settings.json');
+const COMMAND_TAG = '__K11__';
+
+const DEFAULT_SETTINGS = Object.freeze({
+  version: 1,
+  autoHideTopbar: true,
+  autoHideSidebar: true,
+  autoHideDelayMs: 700,
+});
+
+let _audit = null;
+function audit(level, event, data) {
+  if (typeof _audit !== 'function') return;
+  try { _audit(level, `${LOG_TAG}.${event}`, data); } catch (_) {}
+}
+
+function ensureDir() {
+  try { fs.mkdirSync(CONFIG_DIR, { recursive: true }); } catch (_) {}
+}
+
+function loadSettings() {
+  try {
+    ensureDir();
+    if (fs.existsSync(SETTINGS_FILE)) {
+      const raw = JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8'));
+      return Object.assign({}, DEFAULT_SETTINGS, raw || {});
+    }
+  } catch (e) { audit('warn', 'settings_load_failed', { error: String(e) }); }
+  return Object.assign({}, DEFAULT_SETTINGS);
+}
+
+function saveSettings(patch) {
+  try {
+    ensureDir();
+    const next = Object.assign({}, loadSettings(), patch || {}, { version: 1 });
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(next, null, 2), 'utf8');
+    return next;
+  } catch (e) {
+    audit('warn', 'settings_save_failed', { error: String(e) });
+    return loadSettings();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// RENDERER BUNDLE
+// ---------------------------------------------------------------------------
+function __J10WS_K11_RENDERER__() {
+  'use strict';
+  if (window.__J10WS_K11_INSTALLED__) return;
+  window.__J10WS_K11_INSTALLED__ = true;
+
+  const STYLE_ID = 'j10ws-k11-style';
+  const TOPBAR_CLASS = 'j10ws-autohide-topbar';
+  const SIDEBAR_CLASS = 'j10ws-autohide-sidebar';
+  const HIDDEN_CLASS = 'j10ws-autohide-hidden';
+
+  const TOPBAR_SELECTORS = ['header', '.topbar', '#topbar', '.titlebar', '.app-header'];
+  const SIDEBAR_SELECTORS = ['aside', '.sidebar', '#sidebar', '.nav-sidebar', '.left-nav'];
+
+  let settings = { autoHideTopbar: true, autoHideSidebar: true, autoHideDelayMs: 700 };
+  let requestCounter = 0;
+  let isOverlayOpen = false;
+  let maxZIndex = 10000;
+
+  function injectStyle() {
+    if (document.getElementById(STYLE_ID)) return;
+    const st = document.createElement('style');
+    st.id = STYLE_ID;
+    st.textContent = `
+      /* Auto-Hide CSS */
+      .${TOPBAR_CLASS}, .${SIDEBAR_CLASS} { transition: transform 200ms ease, opacity 200ms ease; will-change: transform, opacity; }
+      .${TOPBAR_CLASS}.${HIDDEN_CLASS} { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+      .${SIDEBAR_CLASS}.${HIDDEN_CLASS} { transform: translateX(-100%); opacity: 0; pointer-events: none; }
+      
+      /* Immersive Mode CSS */
+      body.j10ws-immersive-mode .app-header,
+      body.j10ws-immersive-mode .sidebar,
+      body.j10ws-immersive-mode .k10-panel-header,
+      body.j10ws-immersive-mode .k10-tab-strip,
+      body.j10ws-immersive-mode .k10-toolbar,
+      body.j10ws-immersive-mode .k10-bookmarks-bar,
+      body.j10ws-immersive-mode .k10-divider {
+        display: none !important;
+      }
+      
+      body.j10ws-immersive-mode #k10-workspace-view.k10-active {
+        display: flex !important;
+        position: fixed !important;
+        top: 40px !important; bottom: 0 !important; left: 0 !important; right: 0 !important;
+        z-index: 99999 !important; margin: 0 !important; padding: 0 !important;
+        flex-direction: column; background: var(--bg, #0f172a);
+      }
+      
+      body.j10ws-immersive-mode .k10-shell { padding: 0 !important; }
+      body.j10ws-immersive-mode .k10-body { padding: 0 !important; margin: 0 !important; height: 100% !important; }
+      body.j10ws-immersive-mode .k10-panel { border: none !important; border-radius: 0 !important; height: 100% !important; }
+      body.j10ws-immersive-mode .k10-browser-content { height: 100% !important; }
+      
+      /* Immersive Top Bar Container */
+      .j10ws-immersive-topbar {
+        position: fixed; top: 0; left: 0; right: 0; height: 40px;
+        background: #0f172a; border-bottom: 1px solid #1e293b;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 15px; z-index: 100000;
+      }
+      .j10ws-immersive-topbar-title {
+        color: #94a3b8; font-family: system-ui, sans-serif; font-size: 13px; font-weight: 600;
+      }
+
+      /* --- 🌟 PHASE 2: MICRO-INTERACTIONS & A11Y --- */
+      *:focus-visible {
+        outline: 2px solid var(--accent, #06B6D4) !important;
+        outline-offset: 2px !important;
+      }
+      
+      button, .k10-nav-btn, .k10-gbtn, .k10-layout-btn, .k10-modal-btn {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      }
+      
+      button:hover, .k10-nav-btn:hover, .k10-gbtn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.15);
+      }
+      
+      button:active, .k10-nav-btn:active, .k10-gbtn:active, .k10-modal-btn:active {
+        transform: scale(0.96) !important;
+      }
+      
+      .k10-modal {
+        transition: opacity 0.3s ease, transform 0.3s ease !important;
+      }
+      
+      .k10-tab {
+        transition: all 0.2s ease !important;
+      }
+      .k10-tab:hover {
+        background: rgba(255, 255, 255, 0.08) !important;
+      }
+    `;
+    document.head.appendChild(st);
+  }
+  
+  function findFirst(selectors) {
+    for (const s of selectors) {
+      try { const el = document.querySelector(s); if (el) return el; } catch (_) {}
+    }
+    return null;
+  }
+
+  function sendK11Command(action, payload) {
+    return new Promise((resolve) => {
+      const requestId = 'k11r_' + Date.now() + '_' + (++requestCounter);
+      let settled = false;
+      const onReply = (e) => {
+        if (!e.detail || e.detail.requestId !== requestId) return;
+        if (settled) return;
+        settled = true;
+        window.removeEventListener('j10ws-k11-response', onReply);
+        resolve(e.detail.result || { ok: false });
+      };
+      window.addEventListener('j10ws-k11-response', onReply);
+      setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        window.removeEventListener('j10ws-k11-response', onReply);
+        resolve({ ok: false, error: 'timeout' });
+      }, 3000);
+      try {
+        window.jarvis.askAI({ prompt: '__K11__' + JSON.stringify({ action, payload, requestId }), mode: 'offline', subMode: 'direct' });
+      } catch (e) {
+        settled = true; window.removeEventListener('j10ws-k11-response', onReply); resolve({ ok: false, error: String(e) });
+      }
+    });
+  }
+
+  // FEATURE: Make Panel Draggable & Z-Index Manager
+  function makeDraggable(panel) {
+    if (panel.__j10wsDraggable) return;
+    panel.__j10wsDraggable = true;
+    panel.classList.add('j10ws-draggable-panel');
+
+    // 1. Find a suitable header to use as drag handle
+    let header = panel.querySelector('h1, h2, h3, .modal-header, .header, [data-drag="true"]');
+    if (!header) {
+      // If no header found, create a dummy invisible header or use the top 40px
+      header = document.createElement('div');
+      header.style.position = 'absolute';
+      header.style.top = '0'; header.style.left = '0'; header.style.right = '0'; header.style.height = '40px';
+      header.style.zIndex = '10';
+      panel.appendChild(header);
+    }
+    header.classList.add('j10ws-drag-handle');
+
+    // 2. Z-Index Management: Click brings to front
+    panel.addEventListener('mousedown', () => {
+      maxZIndex++;
+      panel.style.zIndex = maxZIndex;
+      
+      // Ensure WebContentsView is hidden so we can see the panel!
+      if (!isOverlayOpen) {
+        isOverlayOpen = true;
+        sendK11Command('overlay.toggle', { open: true }).catch(() => {});
+      }
+    });
+
+    // 3. Drag Logic
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
+
+    header.addEventListener('mousedown', (e) => {
+      // Don't drag if clicking a button inside header
+      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+      
+      isDragging = true;
+      
+      // Get current position relative to viewport
+      const rect = panel.getBoundingClientRect();
+      
+      // If the panel was centered using flex/margin, fix its position to absolute pixels first
+      if (!panel.style.left || panel.style.left === 'auto') {
+        panel.style.left = rect.left + 'px';
+        panel.style.top = rect.top + 'px';
+        panel.style.margin = '0';
+        panel.style.transform = 'none'; // Remove any centering transform
+      }
+
+      startX = e.clientX;
+      startY = e.clientY;
+      initialLeft = parseFloat(panel.style.left);
+      initialTop = parseFloat(panel.style.top);
+
+      e.preventDefault(); // Stop text selection
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      panel.style.left = (initialLeft + dx) + 'px';
+      panel.style.top = (initialTop + dy) + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+  }
+
+  function setupUniversalLayerManager() {
+    // Find all potential modals, settings panels, etc.
+    const selectors = [
+      '.modal', '[class*="modal"]', '[class*="overlay"]', 
+      '#settings-modal', '#voice-modal', '.voice-modal', 
+      '.settings-modal', '.popup', '.dialog', '[class*="panel"]'
+    ];
+    
+    const panels = document.querySelectorAll(selectors.join(','));
+    panels.forEach(panel => {
+      // Ignore the main workspace layout
+      if (panel.id === 'k10-workspace-view' || panel.closest('#k10-workspace-view')) return;
+      // Ignore tiny elements (likely not modals)
+      if (panel.offsetWidth < 100 || panel.offsetHeight < 100) return;
+      
+      makeDraggable(panel);
+    });
+  }
+
+  // Automatically hide browser when any modal is open
+  function checkOverlayState() {
+    const selectors = ['.modal', '[class*="modal"]', '[class*="overlay"]', '#settings-modal', '#voice-modal'];
+    let isOpen = false;
+
+    for (const sel of selectors) {
+      const els = document.querySelectorAll(sel);
+      for (const el of els) {
+        if (el.id === 'k10-workspace-view' || el.closest('#k10-workspace-view')) continue;
+        const style = window.getComputedStyle(el);
+        if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
+          if (el.offsetWidth > 0 || el.offsetHeight > 0) {
+            isOpen = true;
+            break;
+          }
+        }
+      }
+      if (isOpen) break;
+    }
+
+    if (isOpen !== isOverlayOpen) {
+      isOverlayOpen = isOpen;
+      sendK11Command('overlay.toggle', { open: isOpen }).catch(() => {});
+    }
+  }
+
+  function armAutoHide(el, axis) {
+    if (!el || el.__j10wsArmed) return;
+    el.__j10wsArmed = true;
+    const cls = axis === 'top' ? TOPBAR_CLASS : SIDEBAR_CLASS;
+    el.classList.add(cls);
+    el.setAttribute('data-j10ws-axis', axis);
+
+    let hideTimer = null;
+    const show = () => {
+      if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+      el.classList.remove(HIDDEN_CLASS);
+    };
+    const scheduleHide = () => {
+      if (axis === 'top' && !settings.autoHideTopbar) return;
+      if (axis === 'left' && !settings.autoHideSidebar) return;
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => {
+        el.classList.add(HIDDEN_CLASS);
+        hideTimer = null;
+      }, Number(settings.autoHideDelayMs) || 700);
+    };
+
+    el.addEventListener('mouseenter', show);
+    el.addEventListener('mouseleave', scheduleHide);
+    document.addEventListener('mousemove', (e) => {
+      if (axis === 'top' && !settings.autoHideTopbar) return;
+      if (axis === 'left' && !settings.autoHideSidebar) return;
+      if (axis === 'top' && e.clientY <= 6) show();
+      if (axis === 'left' && e.clientX <= 6) show();
+    }, { passive: true });
+  }
+
+  function relocateWorkspaceControls() {
+    const topbar = document.querySelector('.k10-topbar');
+    if (!topbar) return;
+    
+    const layoutGroup = topbar.querySelector('.k10-layout-group');
+    const globalActions = topbar.querySelector('.k10-global-actions');
+    const tabStrip = document.querySelector('.k10-tab-strip');
+    const toolbar = document.querySelector('.k10-toolbar');
+    
+    if (layoutGroup && tabStrip && !tabStrip.querySelector('.k10-layout-group')) {
+      layoutGroup.style.marginLeft = 'auto';
+      layoutGroup.style.paddingRight = '10px';
+      tabStrip.appendChild(layoutGroup);
+    }
+    
+    if (globalActions && toolbar && !toolbar.querySelector('.k10-global-actions')) {
+      globalActions.style.marginLeft = '8px';
+      toolbar.appendChild(globalActions);
+    }
+    
+    topbar.style.display = 'none';
+  }
+
+  function injectImmersiveButton() {
+    const toolbar = document.querySelector('.k10-toolbar');
+    if (!toolbar || document.getElementById('j10ws-immersive-btn')) return;
+    
+    const btn = document.createElement('button');
+    btn.id = 'j10ws-immersive-btn';
+    btn.className = 'k10-nav-btn';
+    btn.title = 'Immersive Fullscreen (Esc to exit)';
+    btn.textContent = '⛶'; 
+    btn.style.marginLeft = '4px';
+    btn.style.fontSize = '14px';
+    
+    btn.onclick = toggleImmersiveMode;
+    toolbar.appendChild(btn);
+  }
+
+  function toggleImmersiveMode() {
+    const isImmersive = document.body.classList.toggle('j10ws-immersive-mode');
+    if (isImmersive) showExitBar(); else hideExitBar();
+    
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 500);
+  }
+
+  function showExitBar() {
+    if (document.getElementById('j10ws-exit-bar')) return;
+    const bar = document.createElement('div');
+    bar.id = 'j10ws-exit-bar';
+    bar.className = 'j10ws-immersive-topbar';
+    const title = document.createElement('div');
+    title.className = 'j10ws-immersive-topbar-title';
+    title.textContent = '🌐 Immersive Browser Mode';
+    const btn = document.createElement('button');
+    btn.textContent = '✕ Exit Fullscreen (Esc)';
+    Object.assign(btn.style, {
+      padding: '5px 12px', background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444',
+      border: '1px solid rgba(239, 68, 68, 0.5)', borderRadius: '4px',
+      cursor: 'pointer', fontFamily: 'inherit', fontSize: '12px', fontWeight: 'bold'
+    });
+    btn.onmouseenter = () => btn.style.background = 'rgba(239, 68, 68, 0.4)';
+    btn.onmouseleave = () => btn.style.background = 'rgba(239, 68, 68, 0.2)';
+    btn.onclick = toggleImmersiveMode;
+    bar.appendChild(title);
+    bar.appendChild(btn);
+    document.body.appendChild(bar);
+  }
+
+  function hideExitBar() {
+    const bar = document.getElementById('j10ws-exit-bar');
+    if (bar) bar.remove();
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.classList.contains('j10ws-immersive-mode')) {
+      toggleImmersiveMode();
+    }
+  });
+
+  function injectSettingsToggle() {
+    const modal = document.querySelector('.k10-modal');
+    if (modal && !modal.querySelector('#j10ws-k11-autohide-toggle')) {
+      const container = document.createElement('div');
+      container.style.marginTop = '15px';
+      container.style.paddingTop = '15px';
+      container.style.borderTop = '1px solid var(--border, #334155)';
+      
+      const label = document.createElement('label');
+      label.style.display = 'flex';
+      label.style.alignItems = 'center';
+      label.style.gap = '8px';
+      label.style.cursor = 'pointer';
+      label.style.color = 'var(--text, #f8fafc)';
+      label.style.fontSize = '13px';
+      
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = 'j10ws-k11-autohide-toggle';
+      checkbox.checked = settings.autoHideTopbar;
+      checkbox.style.width = '16px'; checkbox.style.height = '16px'; checkbox.style.cursor = 'pointer';
+      
+      checkbox.addEventListener('change', (e) => {
+        settings.autoHideTopbar = e.target.checked;
+        settings.autoHideSidebar = e.target.checked;
+        sendK11Command('settings.set', { autoHideTopbar: settings.autoHideTopbar, autoHideSidebar: settings.autoHideSidebar });
+        
+        const topbarTarget = document.querySelector('[data-j10ws-axis="top"]');
+        const sidebarTarget = document.querySelector('[data-j10ws-axis="left"]');
+        if (topbarTarget && !settings.autoHideTopbar) topbarTarget.classList.remove(HIDDEN_CLASS);
+        if (sidebarTarget && !settings.autoHideSidebar) sidebarTarget.classList.remove(HIDDEN_CLASS);
+      });
+      
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(' Enable Auto-Hide (Topbar & Sidebar)'));
+      container.appendChild(label);
+      
+      const actions = modal.querySelector('.k10-modal-actions');
+      if (actions) modal.insertBefore(container, actions);
+      else modal.appendChild(container);
+    }
+  }
+
+  function stripPanelText() {
+    document.querySelectorAll('.k10-panel-header-content').forEach((el) => {
+      if (el.__j10wsTextStripped) return;
+      const text = String(el.textContent || '').trim();
+      if (/^panel\s*\d+$/i.test(text)) {
+        el.textContent = '';
+        el.style.display = 'none';
+        el.__j10wsTextStripped = true;
+      }
+    });
+  }
+
+  async function boot() {
+    injectStyle();
+    const r = await sendK11Command('settings.get', {});
+    if (r && r.ok && r.data) settings = Object.assign(settings, r.data);
+
+    const topbar = findFirst(TOPBAR_SELECTORS);
+    const sidebar = findFirst(SIDEBAR_SELECTORS);
+    if (topbar && settings.autoHideTopbar) armAutoHide(topbar, 'top');
+    if (sidebar && settings.autoHideSidebar) armAutoHide(sidebar, 'left');
+
+    stripPanelText();
+    relocateWorkspaceControls();
+    injectImmersiveButton();
+
+    const mo = new MutationObserver(() => {
+      relocateWorkspaceControls();
+      injectImmersiveButton();
+      injectSettingsToggle();
+      stripPanelText();
+      setupUniversalLayerManager(); // <--- Makes new panels draggable & Z-indexed
+      checkOverlayState();
+      
+      const anyTopbar = findFirst(TOPBAR_SELECTORS);
+      if (anyTopbar && settings.autoHideTopbar && !anyTopbar.__j10wsArmed) armAutoHide(anyTopbar, 'top');
+      
+      const anySidebar = findFirst(SIDEBAR_SELECTORS);
+      if (anySidebar && settings.autoHideSidebar && !anySidebar.__j10wsArmed) armAutoHide(anySidebar, 'left');
+    });
+    try { mo.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style'] }); } catch (_) {}
+
+    window.__j10wsK11 = { version: '1.5.0', settings: Object.assign({}, settings) };
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+}
+
+const RENDERER_SOURCE = '(' + __J10WS_K11_RENDERER__.toString() + ')();';
+
+// ---------------------------------------------------------------------------
+// MAIN PROCESS
+// ---------------------------------------------------------------------------
+let _win = null;
+let _pipelineInstalled = false;
+
+function getMainWindow() {
+  try {
+    const wins = BrowserWindow.getAllWindows();
+    for (const w of wins) {
+      if (w.isDestroyed()) continue;
+      try { const t = w.getTitle(); if (t && /JARVIS-CORE/i.test(t)) return w; } catch (_) {}
+    }
+    return wins[0] || null;
+  } catch (_) { return null; }
+}
+
+async function handleK11Command(action, payload, event) {
+  const win = BrowserWindow.fromWebContents(event.sender) || getMainWindow();
+  if (!win || win.isDestroyed()) return { ok: false, error: 'no_window' };
+
+  switch (action) {
+    case 'settings.get': return { ok: true, data: loadSettings() };
+    case 'settings.set': return { ok: true, data: saveSettings(payload || {}) };
+    case 'fullscreen.toggle': {
+      try {
+        const next = !win.isFullScreen();
+        win.setFullScreen(next);
+        return { ok: true, data: { fullscreen: next } };
+      } catch (e) { return { ok: false, error: String(e) }; }
+    }
+    case 'overlay.toggle': {
+      try {
+        const rt = require('./kernel_10_browser_runtime').getRuntime();
+        if (rt && rt._tabs) {
+          for (const tab of rt._tabs.values()) {
+            try { tab.view.setVisible(!payload.open); } catch (_) {}
+          }
+        }
+        return { ok: true };
+      } catch (e) { return { ok: false, error: String(e) }; }
+    }
+    default: return { ok: false, error: 'unknown_action' };
+  }
+}
+
+function installPipelineWrapper() {
+  if (_pipelineInstalled) return;
+  const tryInstall = () => {
+    const listeners = ipcMain.listeners('jarvis:ai-prompt');
+    if (listeners.length === 0) { setTimeout(tryInstall, 200); return; }
+    const downstream = listeners[0];
+    ipcMain.removeAllListeners('jarvis:ai-prompt');
+
+    ipcMain.on('jarvis:ai-prompt', async (event, data) => {
+      const prompt = data && data.prompt;
+      if (typeof prompt === 'string' && prompt.startsWith(COMMAND_TAG)) {
+        let cmd = null;
+        try { cmd = JSON.parse(prompt.slice(COMMAND_TAG.length)); } catch (e) { return; }
+        if (!cmd || typeof cmd.action !== 'string') return;
+
+        try {
+          const result = await handleK11Command(cmd.action, cmd.payload, event);
+          const win = BrowserWindow.fromWebContents(event.sender);
+          if (win && !win.isDestroyed()) {
+            const reply = JSON.stringify({ requestId: cmd.requestId, result });
+            win.webContents.executeJavaScript('window.dispatchEvent(new CustomEvent("j10ws-k11-response", { detail: ' + reply + ' })); true;').catch(() => {});
+          }
+        } catch (e) {}
+        return;
+      }
+      return downstream(event, data);
+    });
+    _pipelineInstalled = true;
+  };
+  tryInstall();
+}
+
+function wireWindow(win) {
+  if (!win || win.isDestroyed()) return;
+  _win = win;
+
+  const pushFs = (fullscreen) => {
+    try {
+      if (!win.isDestroyed()) {
+        win.webContents.executeJavaScript('window.dispatchEvent(new CustomEvent("j10ws-k11-fullscreen", { detail: { fullscreen: ' + JSON.stringify(!!fullscreen) + ' } })); true;').catch(() => {});
+      }
+    } catch (_) {}
+  };
+  win.on('enter-full-screen', () => pushFs(true));
+  win.on('leave-full-screen', () => pushFs(false));
+
+  setInterval(() => {
+    if (!win || win.isDestroyed()) return;
+    try {
+      const views = win.contentView.children;
+      for (const view of views) {
+        if (view.webContents && !view.webContents.__k11EscHooked) {
+          view.webContents.__k11EscHooked = true;
+          view.webContents.on('before-input-event', (event, input) => {
+            if (input.key === 'Escape' && input.type === 'keyDown') {
+              win.webContents.executeJavaScript(`
+                if (document.body.classList.contains('j10ws-immersive-mode')) {
+                  window.dispatchEvent(new Event('j10ws-k11-escape'));
+                }
+              `).catch(() => {});
+            }
+          });
+        }
+      }
+    } catch (_) {}
+  }, 2000);
+
+  const inject = () => {
+    try {
+      win.webContents.executeJavaScript(RENDERER_SOURCE).catch((e) => audit('warn', 'inject_failed', { error: String(e) }));
+    } catch (e) {}
+  };
+  
+  if (win.webContents.isLoadingMainFrame()) win.webContents.once('did-finish-load', inject);
+  else inject();
+  
+  win.webContents.on('did-navigate', inject);
+  win.webContents.on('did-navigate-in-page', inject);
+}
+
+// ---------------------------------------------------------------------------
+// INIT
+// ---------------------------------------------------------------------------
+function init(ctx) {
+  _audit = ctx && typeof ctx.audit === 'function' ? ctx.audit.bind(ctx) : null;
+  installPipelineWrapper();
+
+  const tryAttach = (retries) => {
+    const win = getMainWindow();
+    if (win) { wireWindow(win); return; }
+    if (retries > 0) setTimeout(() => tryAttach(retries - 1), 500);
+  };
+  tryAttach(10);
+}
+
+module.exports = {
+  name: 'kernel_11_ui_extras',
+  version: '1.0.0',
+  init,
+  DEFAULT_SETTINGS,
+  SETTINGS_FILE,
+};

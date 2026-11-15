@@ -1,0 +1,14 @@
+{
+  "module_name": "communication_block",
+  "version": "1.0.0",
+  "description": "Omnichannel messaging and notification gateway (Telegram, WhatsApp, Email, Webhook).",
+  "default_risk_level": "WRITE_SAFE",
+  "capabilities": [
+    "messaging",
+    "notifications",
+    "omnichannel_routing"
+  ],
+  "registered_tools": [
+    "system_beep"
+  ]
+}

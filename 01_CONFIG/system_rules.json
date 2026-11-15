@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "risk_levels": {
+    "READ": {
+      "allowed_in_unattended": true,
+      "requires_confirmation": false,
+      "description": "Read-only: status polls, screenshots, file reads."
+    },
+    "WRITE_SAFE": {
+      "allowed_in_unattended": true,
+      "requires_confirmation": false,
+      "description": "Writes only inside allowed_write_roots. Reversible."
+    },
+    "RISKY": {
+      "allowed_in_unattended": false,
+      "requires_confirmation": true,
+      "confirm_until_months": 3,
+      "description": "Irreversible or external effect. Explicit confirmation. After 3 months FULL_AUTO may run without asking."
+    },
+    "FORBIDDEN": {
+      "allowed_in_unattended": false,
+      "requires_confirmation": false,
+      "blocked": true,
+      "description": "Never executed in any mode."
+    }
+  },
+  "action_risk": {
+    "hands.status": "READ",
+    "hands.ping": "READ",
+    "screen.capture": "READ",
+    "fs.read": "READ",
+    "test.tick": "READ",
+    "fs.write_local": "WRITE_SAFE",
+    "report.write": "WRITE_SAFE",
+    "input.move": "RISKY",
+    "input.click": "RISKY",
+    "input.type": "RISKY",
+    "input.key": "RISKY",
+    "fs.delete": "RISKY",
+    "app.submit": "RISKY",
+    "email.send": "RISKY",
+    "system.shutdown": "RISKY",
+    "credential.access": "FORBIDDEN",
+    "registry.edit": "FORBIDDEN",
+    "payment.any": "FORBIDDEN"
+  },
+  "default_unknown_action_risk": "RISKY",
+  "forbidden_paths": [
+    "C:\\Windows",
+    "C:\\Program Files",
+    "C:\\Program Files (x86)",
+    "C:\\ProgramData",
+    "%APPDATA%\\Microsoft\\Credentials",
+    "%LOCALAPPDATA%\\Microsoft\\Vault",
+    "%ENGINE%",
+    "%CONFIG%"
+  ],
+  "allowed_write_roots": [
+    "%JARVIS_ROOT%\\work",
+    "%JARVIS_ROOT%\\logs"
+  ],
+  "forbidden_processes": [
+    "1password.exe",
+    "keepass.exe",
+    "keepassxc.exe",
+    "bitwarden.exe",
+    "lastpass.exe",
+    "dashlane.exe"
+  ],
+  "forbidden_title_keywords": [
+    "password",
+    "passcode",
+    "vault",
+    "bank",
+    "bkash",
+    "nagad",
+    "rocket",
+    "otp",
+    "credential",
+    "keepass",
+    "1password",
+    "bitwarden",
+    "lastpass"
+  ],
+  "allowed_title_keywords": [],
+  "sensitive_keywords": [
+    "password",
+    "passwd",
+    "otp",
+    "pin",
+    "cvv",
+    "card",
+    "secret",
+    "token",
+    "api key",
+    "apikey"
+  ]
+}

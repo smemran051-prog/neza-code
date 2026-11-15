@@ -1,0 +1,21 @@
+{
+  "module_name": "data_block",
+  "version": "1.0.0",
+  "description": "Analytical engine for RAG indexing, AST decompilation, PDF/CSV/Excel parsing, and data transformation.",
+  "default_risk_level": "READ",
+  "capabilities": [
+    "rag_indexing",
+    "ast_analysis",
+    "document_parsing",
+    "data_transformation"
+  ],
+  "registered_tools": [
+    "ast_decompiler_llm_pipeline",
+    "deep_master_app_inspector_and_builder",
+    "disk_space_status",
+    "master_app_inspector_and_builder",
+    "read_json_file",
+    "windows_toast",
+    "workspace_knowledge_indexer"
+  ]
+}

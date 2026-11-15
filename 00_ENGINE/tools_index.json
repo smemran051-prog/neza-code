@@ -1,0 +1,683 @@
+{
+  "version": "2.0.0",
+  "updated_at": "2026-11-14T17:41:36.584Z",
+  "total_tools": 35,
+  "sources": [
+    {
+      "source_module": "communication_block",
+      "path": "02_MODULES/communication_block/tools"
+    },
+    {
+      "source_module": "data_block",
+      "path": "02_MODULES/data_block/tools"
+    },
+    {
+      "source_module": "memory_block",
+      "path": "02_MODULES/memory_block/tools"
+    },
+    {
+      "source_module": "network_block",
+      "path": "02_MODULES/network_block/tools"
+    },
+    {
+      "source_module": "system_block",
+      "path": "02_MODULES/system_block/tools"
+    },
+    {
+      "source_module": "00_ENGINE",
+      "path": "00_ENGINE/tools"
+    }
+  ],
+  "tools": [
+    {
+      "name": "advanced_cli_daemon",
+      "file": "advanced_cli_daemon.js",
+      "fileName": "advanced_cli_daemon.js",
+      "relativePath": "02_MODULES/system_block/tools/advanced_cli_daemon.js",
+      "source_module": "system_block",
+      "description": "A0. Advanced Windows CLI daemon: runs terminal commands fast, starts long background jobs (builds, servers, bots) with live logs and job tracking, stops whole process trees, and builds portable .exe (pkg, electron-builder, PyInstaller) or .apk (Gradle) apps in one step.",
+      "tags": [
+        "cli",
+        "daemon",
+        "terminal",
+        "background process",
+        "compile exe",
+        "build apk",
+        "run script",
+        "process manager",
+        "logs",
+        "kill process",
+        "pkg",
+        "pyinstaller",
+        "gradle"
+      ],
+      "risk": "RISKY",
+      "category": "CODE",
+      "enabled": true
+    },
+    {
+      "name": "deep_master_app_inspector_and_builder",
+      "file": "deep_master_app_inspector_and_builder.js",
+      "fileName": "deep_master_app_inspector_and_builder.js",
+      "relativePath": "02_MODULES/data_block/tools/deep_master_app_inspector_and_builder.js",
+      "source_module": "data_block",
+      "description": "A0. Deep code analysis, extracting real source code blocks with line-by-line Bangla engineering breakdowns and PhD study manuals.",
+      "tags": [
+        "deep inspect",
+        "deep analysis",
+        "code study",
+        "bangla lecture",
+        "extract code",
+        "breakdown"
+      ],
+      "risk": "WRITE_SAFE",
+      "category": "CODE",
+      "enabled": true
+    },
+    {
+      "name": "master_app_inspector_and_builder",
+      "file": "master_app_inspector_and_builder.js",
+      "fileName": "master_app_inspector_and_builder.js",
+      "relativePath": "02_MODULES/data_block/tools/master_app_inspector_and_builder.js",
+      "source_module": "data_block",
+      "description": "A0. Inspect any app, folder, script, or .exe to generate a full A-to-Z Engineering Blueprint doc, reconstruction prompt, and auto-build a JARVIS tool.",
+      "tags": [
+        "inspect",
+        "reverse",
+        "blueprint",
+        "architecture",
+        "working principle",
+        "analyze app",
+        "build tool",
+        "auto tool",
+        "create tool",
+        "document",
+        "engineering",
+        "exe",
+        "folder"
+      ],
+      "risk": "WRITE_SAFE",
+      "category": "CODE",
+      "enabled": true
+    },
+    {
+      "name": "workspace_knowledge_indexer",
+      "file": "workspace_knowledge_indexer.js",
+      "fileName": "workspace_knowledge_indexer.js",
+      "relativePath": "02_MODULES/data_block/tools/workspace_knowledge_indexer.js",
+      "source_module": "data_block",
+      "description": "A0. Local RAG workspace knowledge indexer: deep-indexes folders (code, text, symbols and chunks) into a persistent JSON index, searches it with BM25, filename and symbol scoring, live-scans any folder or drive without an index, and reports or cleans index stats. Use it to find old projects, scripts and documents, and to learn existing coding style.",
+      "tags": [
+        "rag",
+        "search files",
+        "knowledge index",
+        "find code",
+        "workspace search",
+        "local memory",
+        "deep file search",
+        "index folder"
+      ],
+      "risk": "WRITE_SAFE",
+      "category": "FILE",
+      "enabled": true
+    },
+    {
+      "name": "ast_decompiler_llm_pipeline",
+      "file": "ast_decompiler_llm_pipeline.js",
+      "fileName": "ast_decompiler_llm_pipeline.js",
+      "relativePath": "02_MODULES/data_block/tools/ast_decompiler_llm_pipeline.js",
+      "source_module": "data_block",
+      "description": "A0. Master AST Parser, Binary/EXE/APK/ASAR Decompiler Hook, and LLM Code Generation Pipeline for extracting, cloning, modifying, and rebuilding applications.",
+      "tags": [
+        "ast",
+        "ast parser",
+        "decompiler",
+        "decompile exe",
+        "decompile apk",
+        "asar extract",
+        "llm pipeline",
+        "clone app",
+        "modify app",
+        "reverse engineer",
+        "rebuild",
+        "barcode scanner"
+      ],
+      "risk": "RISKY",
+      "category": "CODE",
+      "enabled": true
+    },
+    {
+      "name": "system_health_report",
+      "file": "system_health_report.js",
+      "fileName": "system_health_report.js",
+      "relativePath": "02_MODULES/system_block/tools/system_health_report.js",
+      "source_module": "system_block",
+      "description": "A1. Check Windows PC hardware health, free RAM, total memory, CPU model, and system uptime.",
+      "tags": [
+        "system",
+        "health",
+        "ram",
+        "memory",
+        "cpu",
+        "uptime",
+        "pc",
+        "status",
+        "hardware",
+        "check"
+      ],
+      "risk": "READ",
+      "category": "SYSTEM",
+      "enabled": true
+    },
+    {
+      "name": "append_log_entry",
+      "file": "append_log_entry.js",
+      "fileName": "append_log_entry.js",
+      "relativePath": "02_MODULES/system_block/tools/append_log_entry.js",
+      "source_module": "system_block",
+      "description": "Append a single text log entry to a designated text file.",
+      "tags": [
+        "append",
+        "log",
+        "write line",
+        "record"
+      ],
+      "risk": "WRITE_SAFE",
+      "category": "FILE",
+      "enabled": true
+    },
+    {
+      "name": "tool_jarvis_core",
+      "file": "tool_jarvis_core.js",
+      "fileName": "tool_jarvis_core.js",
+      "relativePath": "02_MODULES/system_block/tools/tool_jarvis_core.js",
+      "source_module": "system_block",
+      "description": "Auto-generated execution bridge for Jarvis_Core (exe).",
+      "tags": [
+        "jarvis_core",
+        "jarvis_core",
+        "exe",
+        "auto_tool"
+      ],
+      "risk": "RISKY",
+      "category": "APP",
+      "enabled": true
+    },
+    {
+      "name": "save_workspace_note",
+      "file": "save_workspace_note.js",
+      "fileName": "save_workspace_note.js",
+      "relativePath": "02_MODULES/system_block/tools/save_workspace_note.js",
+      "source_module": "system_block",
+      "description": "B1. Create and save a text or markdown note inside the JARVIS work/notes directory.",
+      "tags": [
+        "note",
+        "save",
+        "report",
+        "markdown",
+        "log",
+        "memo",
+        "draft",
+        "workspace",
+        "summary"
+      ],
+      "risk": "WRITE_SAFE",
+      "category": "FILE",
+      "enabled": true
+    },
+    {
+      "name": "search_local_files",
+      "file": "search_local_files.js",
+      "fileName": "search_local_files.js",
+      "relativePath": "02_MODULES/system_block/tools/search_local_files.js",
+      "source_module": "system_block",
+      "description": "C1. Find and search files by name keyword inside JARVIS root or Desktop folder.",
+      "tags": [
+        "search",
+        "find",
+        "locate",
+        "file",
+        "filename",
+        "desktop",
+        "folder",
+        "scan",
+        "lookup"
+      ],
+      "risk": "READ",
+      "category": "FILE",
+      "enabled": true
+    },
+    {
+      "name": "battery_power_status",
+      "file": "battery_power_status.js",
+      "fileName": "battery_power_status.js",
+      "relativePath": "02_MODULES/system_block/tools/battery_power_status.js",
+      "source_module": "system_block",
+      "description": "Check laptop battery percentage and whether charger is connected.",
+      "tags": [
+        "battery",
+        "charge",
+        "power",
+        "plugged",
+        "charger"
+      ],
+      "risk": "READ",
+      "category": "SYSTEM",
+      "enabled": true
+    },
+    {
+      "name": "inspect_file_metadata",
+      "file": "inspect_file_metadata.js",
+      "fileName": "inspect_file_metadata.js",
+      "relativePath": "02_MODULES/system_block/tools/inspect_file_metadata.js",
+      "source_module": "system_block",
+      "description": "Check size, created date, and last modified date of any file.",
+      "tags": [
+        "file size",
+        "modified date",
+        "stat",
+        "metadata",
+        "file info"
+      ],
+      "risk": "READ",
+      "category": "FILE",
+      "enabled": true
+    },
+    {
+      "name": "clipboard_write",
+      "file": "clipboard_write.js",
+      "fileName": "clipboard_write.js",
+      "relativePath": "02_MODULES/system_block/tools/clipboard_write.js",
+      "source_module": "system_block",
+      "description": "Copy specified text into the Windows OS clipboard.",
+      "tags": [
+        "copy to clipboard",
+        "clipboard write",
+        "set clipboard",
+        "paste"
+      ],
+      "risk": "WRITE_SAFE",
+      "category": "INPUT",
+      "enabled": true
+    },
+    {
+      "name": "create_directory",
+      "file": "create_directory.js",
+      "fileName": "create_directory.js",
+      "relativePath": "02_MODULES/system_block/tools/create_directory.js",
+      "source_module": "system_block",
+      "description": "Create a new folder/directory inside the JARVIS project directory.",
+      "tags": [
+        "mkdir",
+        "create folder",
+        "new directory",
+        "folder"
+      ],
+      "risk": "WRITE_SAFE",
+      "category": "FILE",
+      "enabled": true
+    },
+    {
+      "name": "delete_file",
+      "file": "delete_file.js",
+      "fileName": "delete_file.js",
+      "relativePath": "02_MODULES/system_block/tools/delete_file.js",
+      "source_module": "system_block",
+      "description": "Delete a non-core temporary or work file.",
+      "tags": [
+        "delete",
+        "remove",
+        "unlink",
+        "trash"
+      ],
+      "risk": "RISKY",
+      "category": "FILE",
+      "enabled": true
+    },
+    {
+      "name": "windows_toast",
+      "file": "windows_toast.js",
+      "fileName": "windows_toast.js",
+      "relativePath": "02_MODULES/data_block/tools/windows_toast.js",
+      "source_module": "data_block",
+      "description": "Display a native Windows notification banner.",
+      "tags": [
+        "notification",
+        "toast",
+        "popup alert",
+        "message box"
+      ],
+      "risk": "WRITE_SAFE",
+      "category": "MEDIA",
+      "enabled": true
+    },
+    {
+      "name": "download_file",
+      "file": "download_file.js",
+      "fileName": "download_file.js",
+      "relativePath": "02_MODULES/network_block/tools/download_file.js",
+      "source_module": "network_block",
+      "description": "Download a remote file from an HTTPS URL into work/downloads directory.",
+      "tags": [
+        "download",
+        "get file",
+        "save url",
+        "fetch file"
+      ],
+      "risk": "WRITE_SAFE",
+      "category": "NETWORK",
+      "enabled": true
+    },
+    {
+      "name": "fetch_web_text",
+      "file": "fetch_web_text.js",
+      "fileName": "fetch_web_text.js",
+      "relativePath": "02_MODULES/network_block/tools/fetch_web_text.js",
+      "source_module": "network_block",
+      "description": "Fetch readable HTML/text content from a public URL.",
+      "tags": [
+        "curl",
+        "fetch",
+        "scrape",
+        "web page",
+        "read url"
+      ],
+      "risk": "READ",
+      "category": "NETWORK",
+      "enabled": true
+    },
+    {
+      "name": "disk_space_status",
+      "file": "disk_space_status.js",
+      "fileName": "disk_space_status.js",
+      "relativePath": "02_MODULES/data_block/tools/disk_space_status.js",
+      "source_module": "data_block",
+      "description": "Get free and total storage space of Windows drives.",
+      "tags": [
+        "disk",
+        "storage",
+        "drive",
+        "free space",
+        "c drive"
+      ],
+      "risk": "READ",
+      "category": "SYSTEM",
+      "enabled": true
+    },
+    {
+      "name": "get_current_datetime",
+      "file": "get_current_datetime.js",
+      "fileName": "get_current_datetime.js",
+      "relativePath": "02_MODULES/system_block/tools/get_current_datetime.js",
+      "source_module": "system_block",
+      "description": "Get local system date, time, day name, and ISO string.",
+      "tags": [
+        "time",
+        "date",
+        "today",
+        "clock",
+        "now"
+      ],
+      "risk": "READ",
+      "category": "UTILITY",
+      "enabled": true
+    },
+    {
+      "name": "process_list",
+      "file": "process_list.js",
+      "fileName": "process_list.js",
+      "relativePath": "02_MODULES/system_block/tools/process_list.js",
+      "source_module": "system_block",
+      "description": "List top active background tasks and running programs on Windows.",
+      "tags": [
+        "process",
+        "running",
+        "apps",
+        "tasks",
+        "tasklist"
+      ],
+      "risk": "READ",
+      "category": "SYSTEM",
+      "enabled": true
+    },
+    {
+      "name": "pc_sleep_lock",
+      "file": "pc_sleep_lock.js",
+      "fileName": "pc_sleep_lock.js",
+      "relativePath": "02_MODULES/system_block/tools/pc_sleep_lock.js",
+      "source_module": "system_block",
+      "description": "Lock Windows workstation immediately.",
+      "tags": [
+        "lock",
+        "lock screen",
+        "sleep",
+        "secure"
+      ],
+      "risk": "RISKY",
+      "category": "SYSTEM",
+      "enabled": true
+    },
+    {
+      "name": "fetch_public_ip",
+      "file": "fetch_public_ip.js",
+      "fileName": "fetch_public_ip.js",
+      "relativePath": "02_MODULES/network_block/tools/fetch_public_ip.js",
+      "source_module": "network_block",
+      "description": "Lookup external public IPv4 address of this machine.",
+      "tags": [
+        "public ip",
+        "my ip",
+        "external ip",
+        "network address"
+      ],
+      "risk": "READ",
+      "category": "NETWORK",
+      "enabled": true
+    },
+    {
+      "name": "open_url",
+      "file": "open_url.js",
+      "fileName": "open_url.js",
+      "relativePath": "02_MODULES/network_block/tools/open_url.js",
+      "source_module": "network_block",
+      "description": "Opens any website, URL, YouTube, or Google search in the default system browser.",
+      "tags": [
+        "open",
+        "browser",
+        "youtube",
+        "google",
+        "url",
+        "website",
+        "edge",
+        "chrome"
+      ],
+      "risk": "READ",
+      "category": "NETWORK",
+      "enabled": true
+    },
+    {
+      "name": "network_ping_check",
+      "file": "network_ping_check.js",
+      "fileName": "network_ping_check.js",
+      "relativePath": "02_MODULES/network_block/tools/network_ping_check.js",
+      "source_module": "network_block",
+      "description": "Ping an external host or IP to check network connectivity.",
+      "tags": [
+        "internet",
+        "ping",
+        "network",
+        "connection",
+        "wifi"
+      ],
+      "risk": "READ",
+      "category": "NETWORK",
+      "enabled": true
+    },
+    {
+      "name": "system_beep",
+      "file": "system_beep.js",
+      "fileName": "system_beep.js",
+      "relativePath": "02_MODULES/communication_block/tools/system_beep.js",
+      "source_module": "communication_block",
+      "description": "Play a notification audio beep through the PC motherboard or speakers.",
+      "tags": [
+        "beep",
+        "sound",
+        "alert",
+        "notify",
+        "buzzer"
+      ],
+      "risk": "WRITE_SAFE",
+      "category": "MEDIA",
+      "enabled": true
+    },
+    {
+      "name": "read_json_file",
+      "file": "read_json_file.js",
+      "fileName": "read_json_file.js",
+      "relativePath": "02_MODULES/data_block/tools/read_json_file.js",
+      "source_module": "data_block",
+      "description": "Read and parse a JSON file safely.",
+      "tags": [
+        "json",
+        "parse",
+        "read config",
+        "data"
+      ],
+      "risk": "READ",
+      "category": "FILE",
+      "enabled": true
+    },
+    {
+      "name": "clipboard_read",
+      "file": "clipboard_read.js",
+      "fileName": "clipboard_read.js",
+      "relativePath": "02_MODULES/system_block/tools/clipboard_read.js",
+      "source_module": "system_block",
+      "description": "Read currently copied plain text from the Windows OS clipboard.",
+      "tags": [
+        "clipboard",
+        "copy",
+        "paste",
+        "copied",
+        "clip"
+      ],
+      "risk": "READ",
+      "category": "INPUT",
+      "enabled": true
+    },
+    {
+      "name": "deep_data_recovery",
+      "file": "deep_data_recovery.js",
+      "fileName": "deep_data_recovery.js",
+      "relativePath": "02_MODULES/system_block/tools/deep_data_recovery.js",
+      "source_module": "system_block",
+      "description": "Recover deleted files from a specific drive or SD card using PhotoRec engine.",
+      "tags": [
+        "recover",
+        "data recovery",
+        "undelete",
+        "photorec",
+        "restore files",
+        "sd card",
+        "drive"
+      ],
+      "risk": "RISKY",
+      "category": "FILE",
+      "enabled": true
+    },
+    {
+      "name": "calculate_expression",
+      "file": "calculate_expression.js",
+      "fileName": "calculate_expression.js",
+      "relativePath": "02_MODULES/system_block/tools/calculate_expression.js",
+      "source_module": "system_block",
+      "description": "Safely evaluate pure mathematical expressions.",
+      "tags": [
+        "math",
+        "calc",
+        "calculate",
+        "formula",
+        "evaluate"
+      ],
+      "risk": "READ",
+      "category": "UTILITY",
+      "enabled": true
+    },
+    {
+      "name": "save_memory",
+      "file": "save_memory.js",
+      "fileName": "save_memory.js",
+      "relativePath": "02_MODULES/memory_block/tools/save_memory.js",
+      "source_module": "memory_block",
+      "description": "Save a piece of information to long-term memory.",
+      "tags": [
+        "memory",
+        "save",
+        "remember"
+      ],
+      "risk": "WRITE_SAFE",
+      "category": "SYSTEM",
+      "enabled": true
+    },
+    {
+      "name": "save_vault",
+      "file": "save_vault.js",
+      "fileName": "save_vault.js",
+      "relativePath": "02_MODULES/memory_block/tools/save_vault.js",
+      "source_module": "memory_block",
+      "description": "Save text, code snippets, or local file contents into Layer 3 Knowledge Vault with tags for semantic/keyword retrieval.",
+      "tags": [],
+      "risk": "READ",
+      "category": "FILE",
+      "enabled": true
+    },
+    {
+      "name": "search_memory",
+      "file": "search_memory.js",
+      "fileName": "search_memory.js",
+      "relativePath": "02_MODULES/memory_block/tools/search_memory.js",
+      "source_module": "memory_block",
+      "description": "Search long-term memory for past events, preferences, or facts.",
+      "tags": [
+        "memory",
+        "search",
+        "recall",
+        "remember"
+      ],
+      "risk": "READ",
+      "category": "SYSTEM",
+      "enabled": true
+    },
+    {
+      "name": "search_vault",
+      "file": "search_vault.js",
+      "fileName": "search_vault.js",
+      "relativePath": "02_MODULES/memory_block/tools/search_vault.js",
+      "source_module": "memory_block",
+      "description": "Search the Layer 3 Knowledge Vault using native TF-IDF keyword and tag scoring to retrieve the top 3 most relevant chunks.",
+      "tags": [],
+      "risk": "READ",
+      "category": "FILE",
+      "enabled": true
+    },
+    {
+      "name": "close_app",
+      "file": "close_app.js",
+      "fileName": "close_app.js",
+      "relativePath": "02_MODULES/system_block/tools/close_app.js",
+      "source_module": "system_block",
+      "description": "Terminate or kill a specific running program/process by name.",
+      "tags": [
+        "kill",
+        "close",
+        "terminate",
+        "stop app",
+        "process"
+      ],
+      "risk": "RISKY",
+      "category": "APP",
+      "enabled": true
+    }
+  ]
+}

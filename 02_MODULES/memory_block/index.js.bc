@@ -1,0 +1,24 @@
+'use strict';
+
+const memoryAPI = require('./api');
+
+module.exports = {
+  name: 'memory_block',
+
+  init(ctx) {
+    // Register the Memory API so Central Brain can use it
+    ctx.registerService('memory_block', memoryAPI);
+
+    // Register a simple command to test if it works
+    ctx.addCommand('memory.stats', async () => {
+      const recent = memoryAPI.getRecentMemories(5);
+      return { count: recent.length, recent };
+    });
+
+    ctx.audit('info', 'memory_block_initialized', { storage: 'local_jsonl' });
+  },
+
+  shutdown() {
+    // Cleanup if needed
+  }
+};

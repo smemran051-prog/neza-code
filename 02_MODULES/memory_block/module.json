@@ -1,0 +1,26 @@
+{
+  "name": "memory_block",
+  "version": "2.0.0",
+  "description": "NEZA 3-Layer Memory Architecture (Layer 1: Core Memory, Layer 2: Behavior Rules, Layer 3: Knowledge Vault)",
+  "entry": "api.js",
+  "enabled": true,
+  "capabilities": [
+    "save_core",
+    "get_core",
+    "save_rule",
+    "get_rules",
+    "save_vault",
+    "search_vault"
+  ],
+  "storage": {
+    "layer1": "storage/core_memory.json",
+    "layer2": "storage/behavior_rules.json",
+    "layer3": "storage/vault_index.json"
+  },
+  "registered_tools": [
+    "save_memory",
+    "save_vault",
+    "search_memory",
+    "search_vault"
+  ]
+}

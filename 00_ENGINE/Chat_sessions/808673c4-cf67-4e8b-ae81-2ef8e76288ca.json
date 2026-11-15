@@ -1,0 +1,51 @@
+{
+  "id": "808673c4-cf67-4e8b-ae81-2ef8e76288ca",
+  "name": "hi",
+  "createdAt": 1794077043425,
+  "messages": [
+    {
+      "role": "user",
+      "content": "tumar nam ki"
+    },
+    {
+      "role": "assistant",
+      "content": "আমার নাম জার্ভিস (JARVIS)। আমি আপনাকে কীভাবে সাহায্য করতে পারি?"
+    },
+    {
+      "role": "user",
+      "content": "tumar maliker nam ki"
+    },
+    {
+      "role": "assistant",
+      "content": "আমার মালিক বা নির্মাতা হলো **Google** (গুগল)।"
+    },
+    {
+      "role": "user",
+      "content": "(JARVIS)। er maliker nam kki"
+    },
+    {
+      "role": "assistant",
+      "content": "আমার নির্মাতা হলেন মার্ক জুকারবার্গ (Mark Zuckerberg)। তিনি মেটা (Meta) কোম্পানির প্রধান। \n\n(তবে সিনেমা বা কমিকসের কাল্পনিক JARVIS-এর মালিক হলেন টনি স্টার্ক!)"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello sir. JARVIS online. Systems nominal. \n\nHow can I assist with your architecture, RMA diagnostics, or codebase today?"
+    },
+    {
+      "role": "user",
+      "content": "make a poit 7 line"
+    },
+    {
+      "role": "assistant",
+      "content": "Point 7-এর architectural requirement দিন। কোনো placeholder বা fluff ছাড়াই সরাসরি production code অথবা system design দেওয়া হবে।"
+    },
+    {
+      "role": "assistant",
+      "content": "💬 **Purchased AI Tool Bridge: OFF** — এখন সাধারণ চ্যাট ও Gem সেটআপ মোডে আছেন (কোনো JSON টুল কল যাবে না)।"
+    },
+    {
+      "role": "user",
+      "content": "hello"
+    }
+  ]
+}

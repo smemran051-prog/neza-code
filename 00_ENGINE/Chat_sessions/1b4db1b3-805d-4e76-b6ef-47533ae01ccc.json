@@ -1,0 +1,15 @@
+{
+  "id": "1b4db1b3-805d-4e76-b6ef-47533ae01ccc",
+  "name": "New Chat",
+  "createdAt": 1794077004327,
+  "messages": [
+    {
+      "role": "user",
+      "content": "hello"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello. JARVIS here. How may I assist you today?"
+    }
+  ]
+}

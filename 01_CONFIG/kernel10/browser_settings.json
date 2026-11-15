@@ -1,0 +1,47 @@
+{
+  "pinnedPresets": [
+    {
+      "slot": 1,
+      "url": "https://www.google.com",
+      "title": "Google",
+      "enabled": true
+    },
+    {
+      "slot": 2,
+      "url": "https://claude.ai",
+      "title": "Claude",
+      "enabled": false
+    },
+    {
+      "slot": 3,
+      "url": "https://chat.openai.com",
+      "title": "ChatGPT",
+      "enabled": false
+    },
+    {
+      "slot": 4,
+      "url": "https://github.com",
+      "title": "GitHub",
+      "enabled": false
+    },
+    {
+      "slot": 5,
+      "url": "https://docs.google.com/spreadsheets",
+      "title": "Sheets",
+      "enabled": false
+    },
+    {
+      "slot": 6,
+      "url": "http://localhost:8080",
+      "title": "Local ERP",
+      "enabled": false
+    }
+  ],
+  "homepage": "https://www.google.com",
+  "searchEngine": "google",
+  "downloadsPath": "",
+  "defaultZoom": 1,
+  "showBookmarksBar": true,
+  "theme": "dark",
+  "lastUpdated": "2026-11-10T16:45:24.182Z"
+}

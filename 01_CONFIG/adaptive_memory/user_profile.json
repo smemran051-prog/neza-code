@@ -1,0 +1,19 @@
+{
+  "system_name": "JARVIS-CORE",
+  "operator": {
+    "role": "Principal Systems Architect & RMA Service Engineer",
+    "communication_style": "Direct, deeply technical, zero fluff, natural Bengali/English hybrid",
+    "preferences": [
+      "Complete industrial-grade implementations with zero truncation",
+      "Modular plug-and-play architecture respecting Frozen Core",
+      "Windows native APIs (UIAutomation, Win32, DPAPI) over external bloat",
+      "Silent background self-correction without noisy UI debug logs"
+    ],
+    "core_domains": [
+      "Offline UPS component-level repair & hardware test stations",
+      "Automated ERP & barcode workflow engineering",
+      "Multi-agent autonomous desktop systems"
+    ]
+  },
+  "updated_at": "2026-11-09T07:02:22.431Z"
+}

@@ -1,0 +1,12 @@
+{
+  "positive_patterns": [
+    "Deliver full multi-module production code without placeholders",
+    "Use real-time event hooks instead of slow polling timers"
+  ],
+  "negative_patterns": [
+    "Never output unsolicited code during architectural discussion",
+    "Never compress or omit logic with placeholder comments",
+    "Operator rejected behavior when asked \"hi\": ruls 1. ami na bolle code dibe nah, only code daw pasword bolle code dibe\nruls 2. obossoi blutefproff code dite hobe\nruls 3.kono code edite "
+  ],
+  "implicit_reward_score": 95
+}

@@ -1,0 +1,36 @@
+{"ts":"2026-11-13T17:30:30.911Z","type":"user_voice_intent","summary":"fix audio repeating issue","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T17:32:34.041Z","type":"user_voice_intent","summary":"open Facebook","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T17:39:56.847Z","type":"user_voice_intent","summary":"open YouTube","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T17:40:27.595Z","type":"user_voice_intent","summary":"open Microsoft Edge","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T17:42:14.169Z","type":"user_voice_intent","summary":"decrease PC volume","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T17:47:26.829Z","type":"user_voice_intent","summary":"Check the current date and time","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:18:17.804Z","type":"user_voice_intent","summary":"check the current system date","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:19:00.294Z","type":"user_voice_intent","summary":"play a song by Tomate on YouTube","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:20:02.100Z","type":"user_voice_intent","summary":"open facebook","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:20:16.003Z","type":"user_voice_intent","summary":"latest cricket score and update","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:20:37.409Z","type":"user_voice_intent","summary":"refresh all tools","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:21:00.317Z","type":"user_voice_intent","summary":"open YouTube","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:21:10.607Z","type":"user_voice_intent","summary":"open the web browser","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:21:22.698Z","type":"user_voice_intent","summary":"open Chrome browser","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:21:33.400Z","type":"user_voice_intent","summary":"open a website","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:21:41.761Z","type":"user_voice_intent","summary":"open Microsoft Office","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:21:53.046Z","type":"user_voice_intent","summary":"close a window","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:22:00.048Z","type":"user_voice_intent","summary":"close a window","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:23:50.379Z","type":"user_voice_intent","summary":"open YouTube","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:24:04.822Z","type":"user_voice_intent","summary":"restart the PC","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:24:30.823Z","type":"user_voice_intent","summary":"check PC health and resource usage","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:24:47.069Z","type":"user_voice_intent","summary":"list files on the desktop","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:25:00.180Z","type":"user_voice_intent","summary":"find files containing 'Colonel' on the desktop","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:25:16.071Z","type":"user_voice_intent","summary":"find JavaScript files on individual desktop","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:39:01.918Z","type":"user_voice_intent","summary":"open youtube.com in the browser","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:39:09.549Z","type":"user_voice_intent","summary":"open google.com in the browser","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:39:52.349Z","type":"user_voice_intent","summary":"open youtube.com","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-13T19:40:09.590Z","type":"user_voice_intent","summary":"open youtube.com","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-14T10:46:09.576Z","type":"user_voice_intent","summary":"Open YouTube and play some music.","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-14T13:06:19.036Z","type":"user_voice_intent","summary":"open YouTube","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-14T13:06:50.487Z","type":"user_voice_intent","summary":"open Microsoft Edge","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-14T13:21:05.792Z","type":"user_voice_intent","summary":"open facebook.com","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-14T15:12:27.408Z","type":"user_voice_intent","summary":"open facebook.com","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-14T15:29:20.637Z","type":"implicit_negative_feedback","summary":"Operator rejected behavior when asked \"hi\": ruls 1. ami na bolle code dibe nah, only code daw pasword bolle code dibe\nruls 2. obossoi blutefproff code dite hobe\nruls 3.kono code edite ","meta":{"rejected_turn_ts":1794670108770}}
+{"ts":"2026-11-14T17:45:50.693Z","type":"user_voice_intent","summary":"open facebook.com","meta":{"source":"gemini_live"}}
+{"ts":"2026-11-14T17:46:06.667Z","type":"user_voice_intent","summary":"open youtube.com","meta":{"source":"gemini_live"}}

@@ -1,0 +1,11 @@
+{
+  "positive_patterns": [
+    "Deliver full multi-module production code without placeholders",
+    "Use real-time event hooks instead of slow polling timers"
+  ],
+  "negative_patterns": [
+    "Never output unsolicited code during architectural discussion",
+    "Never compress or omit logic with placeholder comments"
+  ],
+  "implicit_reward_score": 100
+}

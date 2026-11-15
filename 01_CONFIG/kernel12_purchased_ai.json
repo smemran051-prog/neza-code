@@ -1,0 +1,14 @@
+{
+  "activeUrl": "https://gemini.google.com/app/d2772674191959ab",
+  "preset": "gemini",
+  "toolBridgeEnabled": false,
+  "maxToolSteps": 8,
+  "responseTimeoutMs": 120000,
+  "presets": {
+    "gemini": "https://gemini.google.com/app",
+    "claude": "https://claude.ai/new",
+    "chatgpt": "https://chatgpt.com/",
+    "deepseek": "https://chat.deepseek.com/"
+  },
+  "updatedAt": "2026-11-14T17:46:22.513Z"
+}

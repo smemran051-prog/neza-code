@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-14T16:22:06.537Z",
+  "rules": [
+    {
+      "id": "rule_default_1",
+      "category": "system",
+      "instruction": "Prioritize modular, local-first execution and strict error handling.",
+      "priority": "high",
+      "createdAt": "2026-11-14T16:22:06.537Z"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "extensions": [
+    "kernel_2_telegram.js",
+    "kernel_3_night_mode.js",
+    "kernel_4_ui_manager.js",
+    "kernel_5_brain_router.js",
+    "kernel_6_tool_librarian.js",
+    "kernel_7_chat_manager.js",
+    "kernel_8_cloud_sync.js",
+    "kernel_9_adaptive_intelligence.js",
+    "kernel_10_neural_tab_bridge.js",
+    "kernel_11_ui_extras.js",
+    "kernel_12_agent_bridge.js",
+    "kernel_15_orchestrator.js"
+  ]
+}
